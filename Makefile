@@ -8,9 +8,10 @@ DEPS_PATH = deps
 
 
 CC = g++
+CPPVERSION = -std=c++17
 WARNING_FLAGS = 
 OPTMIZATION_FLAGS =
-INCLUDES = -I $(DEPS_PATH)
+INCLUDES = -I $(DEPS_PATH) -I $(SOURCE_PATH)
 
 
 # debug / release
@@ -19,7 +20,7 @@ MODE = debug
 ifeq ($(MODE),debug)
 	
 	WARNING_FLAGS = -Wall -Wextra
-	OPTMIZATION_FLAGS = -O0
+	OPTMIZATION_FLAGS = -Og
 
 else ifeq ($(MODE),release)
 	
@@ -28,7 +29,7 @@ else ifeq ($(MODE),release)
 
 endif
 
-CFLAGS = $(WARNING_FLAGS) $(OPTMIZATION_FLAGS) $(INCLUDES)
+CFLAGS = $(WARNING_FLAGS) $(OPTMIZATION_FLAGS) $(INCLUDES) $(CPPVERSION)
 
 
 

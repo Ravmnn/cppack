@@ -1,0 +1,50 @@
+{
+    // .cpproj template file
+
+    // name of the project.
+    "project_name": "cppack",
+    
+    // executable or library.
+    "project_type": "library",
+    
+    // the name of the dependencies.
+    "project_dependencies": ["Dep1", "Dep2", "stdlib"],
+    
+    // path to the directory storing the .cpp/.c files.
+    "project_source_directory": "src",
+
+    // path to the directory storing the .hpp/.h files.
+    // if not defined, "project_source_path" will be used.
+    "project_header_directory": "include",
+
+    // additional paths for searching for .hpp/.h files.
+    "additional_include_paths": [],
+
+    // current build setting to use when building.
+    "current_build_setting": "debug",
+
+    // build settings containing data that tell the compiler how to
+    // compile the project.
+    "build_settings": {
+        "debug": {
+            // none, low, medium, high, extreme, shrink, extreme_shrink, debug
+            //  -O0, -O1,    -O2,  -O3,  -Ofast,    -Os,            -Oz,   -Og
+            "optimization": "debug",
+
+            // none, normal,   all,    extra
+            //   -w,         -Wall,   (-Wall and -Wextra)
+            "warning": "normal",
+
+            // macros with no value to be defined.
+            "defines": [],
+
+            // additional options passed to the compiler.
+            "additional_options": ""
+        },
+
+        "release": {
+            "optimization": "high",
+            "warning": "none"
+        }
+    }
+}

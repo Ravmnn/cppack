@@ -1,0 +1,28 @@
+{
+    "project_name": "cppack",
+    "project_type": "library",
+    "project_dependencies": ["Dep1", "Dep2", "stdlib"],
+
+    "project_source_directory": "src",
+    "project_header_directory": "include",
+
+    "additional_include_paths": [],
+
+    "current_build_setting": "debug",
+
+    "build_settings": {
+        "debug": {
+            "optimization": "debug",
+            "warning": "normal",
+            "defines": [],
+            "additional_options": ""
+        },
+
+        "release": {
+            "optimization": "high",
+            "warning": "none",
+            "defines": [],
+            "additional_options": ""
+        }
+    }
+}

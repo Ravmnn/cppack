@@ -1,18 +1,24 @@
-#include <iostream>
-
 #include <CLI11.hpp>
+
+#include <project_data.hpp>
+
 
 
 int main(int argc, char** argv)
 {
     CLI::App app("User-friendly C++ project manager.", "cppack");
 
-    bool result = false;
-    app.add_flag("-t,--test,!--no-test", result);
+    // bool result = false;
+    // app.add_flag("-t,--test,!--no-test", result);
 
-    CLI11_PARSE(app, argc, argv)
+    // std::string val;
+    // app.add_option("myopt1", val);
 
-    std::cout << result << std::endl;
+//    CLI11_PARSE(app, argc, argv)
+
+    std::ifstream file("cppack.cpproj");
+
+    printProjectData(projectDataFromJson(json::parse(file)));
 
     return 0;
 }
