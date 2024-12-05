@@ -1,9 +1,5 @@
 #pragma once
 
-#include <string>
-#include <vector>
-#include <map>
-
 #include <json.hpp>
 
 
@@ -24,7 +20,8 @@ enum class BuildOptimizationType
 };
 
 std::string buildOptimizationTypeToString(BuildOptimizationType level);
-BuildOptimizationType buildOptimizationTypeFromString(std::string source);
+BuildOptimizationType buildOptimizationTypeFromString(const std::string& source);
+
 
 
 
@@ -37,7 +34,8 @@ enum class BuildWarningType
 };
 
 std::string buildWarningTypeToString(BuildWarningType level);
-BuildWarningType buildWarningTypeFromString(std::string source);
+BuildWarningType buildWarningTypeFromString(const std::string& source);
+
 
 
 
@@ -48,12 +46,15 @@ enum class ProjectType
 };
 
 std::string projectTypeToString(ProjectType type);
-ProjectType projectTypeFromString(std::string source);
+ProjectType projectTypeFromString(const std::string& source);
 
 
 
-struct BuildSettings
+
+struct BuildSetting
 {
+    std::string name;
+
     BuildOptimizationType optimizationType;
     BuildWarningType warningType;
 
@@ -62,7 +63,11 @@ struct BuildSettings
     std::string additionalOptions;
 };
 
-BuildSettings buildSettingsFromJson(json jsonData);
+BuildSetting buildSettingsFromJson(const json& jsonData);
+std::vector<BuildSetting> buildSettingsVectorFromJson(const json& jsonData);
+
+std::vector<std::string> getListOfBuildSettingNames(const std::vector<BuildSetting>& settings) noexcept;
+
 
 
 
@@ -78,11 +83,13 @@ struct ProjectData
     std::vector<std::string> additionalIncludePaths;
 
     std::string currentBuildSetting;
-    std::map<std::string, BuildSettings> buildSettings;
+    std::vector<BuildSetting> buildSettings;
 };
 
 
-ProjectData projectDataFromJson(json jsonData);
+ProjectData projectDataFromJson(const json& jsonData);
 
 
-void printProjectData(ProjectData data);
+
+
+void printProjectData(const ProjectData& data);
