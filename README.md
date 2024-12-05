@@ -1,0 +1,1 @@
+cppack is a tool for handling C++ projects in a user-friendly way.<br>Under development 🔨.
