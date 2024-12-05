@@ -1,11 +1,35 @@
-CC = g++
-CFLAGS = 
-OPTMIZATION_FLAGS =
-
+MAKEFLAGS += -j4
 
 SOURCE_PATH = src
 BUILD_PATH = build
 OBJECT_PATH = $(BUILD_PATH)/obj
+
+DEPS_PATH = deps
+
+
+CC = g++
+WARNING_FLAGS = 
+OPTMIZATION_FLAGS =
+INCLUDES = -I $(DEPS_PATH)
+
+
+# debug / release
+MODE = debug
+
+ifeq ($(MODE),debug)
+	
+	WARNING_FLAGS = -Wall -Wextra
+	OPTMIZATION_FLAGS = -O0
+
+else ifeq ($(MODE),release)
+	
+	WARNING_FLAGS = -w
+	OPTMIZATION_FLAGS = -O3 -flto
+
+endif
+
+CFLAGS = $(WARNING_FLAGS) $(OPTMIZATION_FLAGS) $(INCLUDES)
+
 
 
 SOURCES = $(shell find $(SOURCE_PATH) -name "*.cpp")
@@ -17,27 +41,11 @@ APP_PATH = $(BUILD_PATH)/$(APP_NAME)
 
 
 
-MODE = debug # debug / release
-
-ifeq ($(MODE), debug)
-
-	CFLAGS = -Wall -Wextra
-	OPTMIZATION_FLAGS = -O0
-
-else ifeq($(MODE), release)
-
-	CFLAGS = -w
-	OPTMIZATION_FLAGS = -O3 -flto
-
-endif
-
-
-
 .PHONY: all clean
 
 
 
-all: $(APP_PATH)
+all build: $(APP_PATH)
 
 
 
@@ -49,13 +57,13 @@ run: all
 
 $(APP_PATH): $(OBJECTS)
 	@ echo Linking executable file at $(APP_PATH)
-	@ $(CC) $(OBJECTS) -o $(APP_PATH) $(CFLAGS) $(OPTMIZATION_FLAGS)
+	@ $(CC) $(OBJECTS) -o $(APP_PATH) $(CFLAGS)
 
 
 $(OBJECTS): $(OBJECT_PATH)/%.o: $(SOURCE_PATH)/%.cpp
 	@ echo Compiling $<
 	@ mkdir $(dir $@) -p
-	@ $(CC) -c $< -o $@ $(CFLAGS) $(OPTMIZATION_FLAGS)
+	@ $(CC) -c $< -o $@ $(CFLAGS)
 
 
 
