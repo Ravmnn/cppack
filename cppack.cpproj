@@ -1,29 +1,29 @@
 {
-    "project_name": "cppack",
-    "project_type": "library",
-    "project_dependencies": ["Dep1", "Dep2", "stdlib"],
-
-    "project_source_directory": "src",
-    "project_header_directory": "include",
-
-    "additional_include_paths": [],
-
-    "current_build_setting": "debug",
-
-    "build_settings": [
-        {
-            "name": "debug",
-            "optimization": "debug",
-            "warning": "normal",
-            "defines": [],
-            "additional_options": ""
-        },
-        {
-            "name": "release",
-            "optimization": "high",
-            "warning": "none",
-            "defines": [],
-            "additional_options": ""
-        }
-    ]
+	"name": "cppack",
+	"type": "library",
+	"dependencies": [
+		"Dep1",
+		"Dep2",
+		"stdlib"
+	],
+	"source_directory": "src",
+	"header_directory": "include",
+	"additional_include_paths": [],
+	"current_build_setting": "debug",
+	"build_settings": [
+		{
+			"name": "debug",
+			"optimization": "debug",
+			"warning": "normal",
+			"defines": [],
+			"additional_options": ""
+		},
+		{
+			"name": "release",
+			"optimization": "high",
+			"warning": "none",
+			"defines": [],
+			"additional_options": ""
+		}
+	]
 }

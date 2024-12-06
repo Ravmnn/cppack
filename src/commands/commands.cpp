@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+#include <cppack.hpp>
+
 
 
 CommandInit::CommandInit(CLI::App* const app) : Command(app, "init", "Creates a new project")
@@ -24,5 +26,11 @@ CommandInfo::CommandInfo(CLI::App* const app) : Command(app, "info", "Prints inf
 
 void CommandInfo::run() const noexcept
 {
+	if (!CPPack::currentDirectoryContainsProjectFile())
+	{
+		std::cout << "Current directory isn't a project." << std::endl;
+		return;
+	}
+
 	std::cout << "running info command" << std::endl;
 }

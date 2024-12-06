@@ -63,8 +63,9 @@ bool isProjectTypeStringValid(const std::string& source) noexcept;
 
 
 
-struct BuildSetting
+class BuildSetting : public JsonConversible
 {
+public:
     std::string name;
 
     BuildOptimizationType optimizationType;
@@ -75,7 +76,14 @@ struct BuildSetting
     std::string additionalOptions;
 
 
-    static BuildSetting fromJson(const json& jsonData) noexcept;
+    explicit BuildSetting(const json& jsonData) noexcept;
+
+
+    void fromJson(const json& jsonData) noexcept override;
+    json toJson() const noexcept override;
+
+
+    static json toJsonArray(const std::vector<BuildSetting>& data) noexcept;
     static std::vector<BuildSetting> vectorFromJson(const json& jsonData) noexcept;
 
     static std::vector<std::string> getBuildSettingNames(const std::vector<BuildSetting>& settings) noexcept;
@@ -83,8 +91,9 @@ struct BuildSetting
 
 
 
-struct ProjectData
+class ProjectData : public JsonConversible
 {
+public:
     std::string name;
     ProjectType type;
 
@@ -98,7 +107,11 @@ struct ProjectData
     std::vector<BuildSetting> buildSettings;
 
 
-    static ProjectData fromJson(const json& jsonData) noexcept;
+    explicit ProjectData(const json& jsonData) noexcept;
+
+
+    void fromJson(const json& jsonData) noexcept override;
+    json toJson() const noexcept override;
 };
 
 
@@ -106,20 +119,24 @@ struct ProjectData
 class ProjectDataManager
 {
 private:
-	ProjectData _projectData;
+	ProjectData _data;
 
 
 public:
 	ProjectDataManager() = delete;
 
-	ProjectDataManager(const ProjectData& data);
-	ProjectDataManager(const json& jsonData);
+	explicit ProjectDataManager(const ProjectData& data);
+	explicit ProjectDataManager(const json& jsonData);
 
 
-	void set_data(const ProjectData& data) noexcept { _projectData = data; }
+	const ProjectData& get_data() const noexcept { return _data; }
 
-	const ProjectData& data() const noexcept { return _projectData; }
+	void set_data(const ProjectData& data) noexcept { _data = data; }
 
 
 	void print() const noexcept;
+
+
+	void writeToFile(const std::string& path) const;
+	void readFromFile(const std::string& path);
 };

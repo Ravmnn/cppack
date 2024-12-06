@@ -2,20 +2,20 @@
     // .cpproj template file
 
     // name of the project.
-    "project_name": "cppack",
-    
+    "name": "cppack",
+
     // executable or library.
-    "project_type": "library",
-    
+    "type": "library",
+
     // the name of the dependencies.
-    "project_dependencies": ["Dep1", "Dep2", "stdlib"],
-    
+    "dependencies": ["Dep1", "Dep2", "stdlib"],
+
     // path to the directory storing the .cpp/.c files.
-    "project_source_directory": "src",
+    "source_directory": "src",
 
     // path to the directory storing the .hpp/.h files.
-    // if not defined, "project_source_path" will be used.
-    "project_header_directory": "include",
+    // if not defined, "source_path" will be used.
+    "header_directory": "include",
 
     // additional paths for searching for .hpp/.h files.
     "additional_include_paths": [],

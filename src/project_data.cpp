@@ -2,8 +2,8 @@
 
 #include <iostream>
 
-#include <json_conversions.hpp>
 #include <utility/vector.hpp>
+#include <json.hpp>
 
 
 
@@ -113,15 +113,44 @@ bool isProjectTypeStringValid(const std::string& source) noexcept
 
 
 
-BuildSetting BuildSetting::fromJson(const json& jsonData) noexcept
+BuildSetting::BuildSetting(const json& jsonData) noexcept
 {
-    return {
-        .name = jsonData["name"],
-        .optimizationType = buildOptimizationTypeFromString(jsonData["optimization"]),
-        .warningType = buildWarningTypeFromString(jsonData["warning"]),
-        .defines = convertJsonStringArrayToVector(jsonData["defines"]),
-        .additionalOptions = jsonData["additional_options"]
-    };
+	fromJson(jsonData);
+}
+
+
+
+void BuildSetting::fromJson(const json& jsonData) noexcept
+{
+    name = jsonData["name"];
+    optimizationType = buildOptimizationTypeFromString(jsonData["optimization"]);
+    warningType = buildWarningTypeFromString(jsonData["warning"]);
+    defines = convertJsonStringArrayToVector(jsonData["defines"]);
+    additionalOptions = jsonData["additional_options"];
+}
+
+
+json BuildSetting::toJson() const noexcept
+{
+	return {
+		{ "name", name },
+		{ "optimization", buildOptimizationTypeToString(optimizationType) },
+		{ "warning", buildWarningTypeToString(warningType) },
+		{ "defines", defines },
+		{ "additional_options", additionalOptions }
+	};
+}
+
+
+
+json BuildSetting::toJsonArray(const std::vector<BuildSetting>& data) noexcept
+{
+	json jsonData;
+
+	for (const BuildSetting& setting : data)
+		jsonData[setting.name] = setting.toJson();
+
+	return jsonData;
 }
 
 
@@ -130,7 +159,7 @@ std::vector<BuildSetting> BuildSetting::vectorFromJson(const json& jsonData) noe
     std::vector<BuildSetting> buildSettings;
 
     for (const auto& item : jsonData)
-        buildSettings.push_back(BuildSetting::fromJson(item));
+        buildSettings.push_back(BuildSetting(item));
 
     return buildSettings;
 }
@@ -150,33 +179,51 @@ std::vector<std::string> BuildSetting::getBuildSettingNames(const std::vector<Bu
 
 
 
-ProjectData ProjectData::fromJson(const json& jsonData) noexcept
+ProjectData::ProjectData(const json& jsonData) noexcept
+{
+	fromJson(jsonData);
+}
+
+
+
+void ProjectData::fromJson(const json& jsonData) noexcept
 {
     // TODO: add default values if value is null
 
-    return {
-        .name = jsonData["project_name"],
-        .type = projectTypeFromString(jsonData["project_type"]),
-        .dependencies = convertJsonStringArrayToVector(jsonData["project_dependencies"]),
-        .sourceDirectory = jsonData["project_source_directory"],
-        .headerDirectory = jsonData["project_header_directory"],
-        .additionalIncludePaths = convertJsonStringArrayToVector(jsonData["additional_include_paths"]),
-        .currentBuildSetting = jsonData["current_build_setting"],
-        .buildSettings = BuildSetting::vectorFromJson(jsonData["build_settings"]),
-    };
+    name = jsonData["project_name"];
+    type = projectTypeFromString(jsonData["project_type"]);
+    dependencies = convertJsonStringArrayToVector(jsonData["project_dependencies"]);
+    sourceDirectory = jsonData["project_source_directory"];
+    headerDirectory = jsonData["project_header_directory"];
+    additionalIncludePaths = convertJsonStringArrayToVector(jsonData["additional_include_paths"]);
+    currentBuildSetting = jsonData["current_build_setting"];
+    buildSettings = BuildSetting::vectorFromJson(jsonData["build_settings"]);
 }
 
 
-
-
-
-ProjectDataManager::ProjectDataManager(const ProjectData& data)
+json ProjectData::toJson() const noexcept
 {
-	_projectData = data;
+	return {
+		{ "name", name },
+		{ "type", projectTypeToString(type) },
+		{ "dependencies", dependencies },
+		{ "source_directory", sourceDirectory },
+		{ "header_directory", headerDirectory },
+		{ "additional_include_paths", additionalIncludePaths },
+		{ "current_build_setting", currentBuildSetting },
+		{ "build_settings", BuildSetting::toJsonArray(buildSettings) }
+	};
 }
 
 
-ProjectDataManager::ProjectDataManager(const json& jsonData) : ProjectDataManager(ProjectData::fromJson(jsonData))
+
+
+
+ProjectDataManager::ProjectDataManager(const ProjectData& data) : _data(data)
+{}
+
+
+ProjectDataManager::ProjectDataManager(const json& jsonData) : ProjectDataManager(ProjectData(jsonData))
 {}
 
 
@@ -184,14 +231,27 @@ ProjectDataManager::ProjectDataManager(const json& jsonData) : ProjectDataManage
 
 void ProjectDataManager::print() const noexcept
 {
-    std::cout << "name: " << _projectData.name << std::endl;
-    std::cout << "type: " << projectTypeToString(_projectData.type) << std::endl;
-    std::cout << "dependencies: " << joinStringVector(_projectData.dependencies, ", ") << std::endl;
+    std::cout << "name: " << _data.name << std::endl;
+    std::cout << "type: " << projectTypeToString(_data.type) << std::endl;
+    std::cout << "dependencies: " << joinStringVector(_data.dependencies, ", ") << std::endl;
 
-    std::cout << "source directory: " << _projectData.sourceDirectory << std::endl;
-    std::cout << "header directory: " << _projectData.headerDirectory << std::endl;
-    std::cout << "additional include paths: " << joinStringVector(_projectData.additionalIncludePaths, ", ") << std::endl;
+    std::cout << "source directory: " << _data.sourceDirectory << std::endl;
+    std::cout << "header directory: " << _data.headerDirectory << std::endl;
+    std::cout << "additional include paths: " << joinStringVector(_data.additionalIncludePaths, ", ") << std::endl;
 
-    std::cout << "current build setting: " << _projectData.currentBuildSetting << std::endl;
-    std::cout << "build settings: " << joinStringVector(BuildSetting::getBuildSettingNames(_projectData.buildSettings), ", ") << std::endl;
+    std::cout << "current build setting: " << _data.currentBuildSetting << std::endl;
+    std::cout << "build settings: " << joinStringVector(BuildSetting::getBuildSettingNames(_data.buildSettings), ", ") << std::endl;
+}
+
+
+
+void ProjectDataManager::writeToFile(const std::string& path) const
+{
+	writeJsonToFile(_data.toJson(), path);
+}
+
+
+void ProjectDataManager::readFromFile(const std::string& path)
+{
+	_data.fromJson(readJsonFromFile(path));
 }
