@@ -59,15 +59,15 @@ struct BuildSetting
     BuildWarningType warningType;
 
     std::vector<std::string> defines;
-    
+
     std::string additionalOptions;
+
+
+    static BuildSetting fromJson(const json& jsonData) noexcept;
+    static std::vector<BuildSetting> vectorFromJson(const json& jsonData) noexcept;
+
+    static std::vector<std::string> getBuildSettingNames(const std::vector<BuildSetting>& settings) noexcept;
 };
-
-BuildSetting buildSettingsFromJson(const json& jsonData);
-std::vector<BuildSetting> buildSettingsVectorFromJson(const json& jsonData);
-
-std::vector<std::string> getListOfBuildSettingNames(const std::vector<BuildSetting>& settings) noexcept;
-
 
 
 
@@ -84,12 +84,30 @@ struct ProjectData
 
     std::string currentBuildSetting;
     std::vector<BuildSetting> buildSettings;
+
+
+    static ProjectData fromJson(const json& jsonData) noexcept;
 };
 
 
-ProjectData projectDataFromJson(const json& jsonData);
+
+class ProjectDataManager
+{
+private:
+	ProjectData _projectData;
 
 
+public:
+	ProjectDataManager() = delete;
+
+	ProjectDataManager(const ProjectData& data);
+	ProjectDataManager(const json& jsonData);
 
 
-void printProjectData(const ProjectData& data);
+	void set(const ProjectData& data) noexcept { _projectData = data; }
+
+	const ProjectData& get() const noexcept { return _projectData; }
+
+
+	void print() const noexcept;
+};

@@ -18,7 +18,8 @@ int main(int argc, char** argv)
 
     std::ifstream file("cppack.cpproj");
 
-    printProjectData(projectDataFromJson(json::parse(file)));
+    ProjectDataManager data(json::parse(file));
+    data.print();
 
     return 0;
 }

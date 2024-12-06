@@ -7,9 +7,9 @@ OBJECT_PATH = $(BUILD_PATH)/obj
 DEPS_PATH = deps
 
 
-CC = g++
+CC = clang++
 CPPVERSION = -std=c++17
-WARNING_FLAGS = 
+WARNING_FLAGS =
 OPTMIZATION_FLAGS =
 INCLUDES = -I $(DEPS_PATH) -I $(SOURCE_PATH)
 
@@ -18,12 +18,12 @@ INCLUDES = -I $(DEPS_PATH) -I $(SOURCE_PATH)
 MODE = debug
 
 ifeq ($(MODE),debug)
-	
+
 	WARNING_FLAGS = -Wall -Wextra
 	OPTMIZATION_FLAGS = -Og
 
 else ifeq ($(MODE),release)
-	
+
 	WARNING_FLAGS = -w
 	OPTMIZATION_FLAGS = -O3 -flto
 

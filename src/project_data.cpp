@@ -19,7 +19,7 @@ std::string buildOptimizationTypeToString(const BuildOptimizationType type)
         case BuildOptimizationType::Shrink:        return "shrink";
         case BuildOptimizationType::ExtremeShrink: return "extreme_shrink";
         case BuildOptimizationType::Debug:         return "debug";
-    
+
         default: return "invalid";
     }
 }
@@ -76,7 +76,7 @@ std::string projectTypeToString(const ProjectType type)
     switch (type)
     {
         case ProjectType::Executable: return "executable";
-        case ProjectType::Library: return "library";
+        case ProjectType::Library:    return "library";
 
         default: return "invalid";
     }
@@ -86,7 +86,7 @@ std::string projectTypeToString(const ProjectType type)
 ProjectType projectTypeFromString(const std::string& source)
 {
     if (source == "executable") return ProjectType::Executable;
-    if (source == "library") return ProjectType::Library;
+    if (source == "library")    return ProjectType::Library;
 
     return ProjectType::Executable;
 }
@@ -95,34 +95,30 @@ ProjectType projectTypeFromString(const std::string& source)
 
 
 
-BuildSetting buildSettingsFromJson(const json& jsonData)
+BuildSetting BuildSetting::fromJson(const json& jsonData) noexcept
 {
-    // TODO: code like that can use the "Type { .member = val }" syntax
-
-    BuildSetting settings;
-
-    settings.name = jsonData["name"];
-    settings.optimizationType = buildOptimizationTypeFromString(jsonData["optimization"]);
-    settings.warningType = buildWarningTypeFromString(jsonData["warning"]);
-    settings.defines = convertJsonStringArrayToVector(jsonData["defines"]);
-    settings.additionalOptions = jsonData["additional_options"];
-
-    return settings;
+    return {
+        .name = jsonData["name"],
+        .optimizationType = buildOptimizationTypeFromString(jsonData["optimization"]),
+        .warningType = buildWarningTypeFromString(jsonData["warning"]),
+        .defines = convertJsonStringArrayToVector(jsonData["defines"]),
+        .additionalOptions = jsonData["additional_options"]
+    };
 }
 
 
-std::vector<BuildSetting> buildSettingsVectorFromJson(const json& jsonData)
+std::vector<BuildSetting> BuildSetting::vectorFromJson(const json& jsonData) noexcept
 {
     std::vector<BuildSetting> buildSettings;
 
     for (const auto& item : jsonData)
-        buildSettings.push_back(buildSettingsFromJson(item));
+        buildSettings.push_back(BuildSetting::fromJson(item));
 
     return buildSettings;
 }
 
 
-std::vector<std::string> getListOfBuildSettingNames(const std::vector<BuildSetting>& settings) noexcept
+std::vector<std::string> BuildSetting::getBuildSettingNames(const std::vector<BuildSetting>& settings) noexcept
 {
     std::vector<std::string> names;
 
@@ -136,45 +132,48 @@ std::vector<std::string> getListOfBuildSettingNames(const std::vector<BuildSetti
 
 
 
-ProjectData projectDataFromJson(const json& jsonData)
+ProjectData ProjectData::fromJson(const json& jsonData) noexcept
 {
-    ProjectData data;
-
     // TODO: add default values if value is null
 
-    data.name = jsonData["project_name"];
-    data.type = projectTypeFromString(jsonData["project_type"]);
-    data.dependencies = convertJsonStringArrayToVector(jsonData["project_dependencies"]);
-    data.sourceDirectory = jsonData["project_source_directory"];
-    data.headerDirectory = jsonData["project_header_directory"];
-    data.additionalIncludePaths = convertJsonStringArrayToVector(jsonData["additional_include_paths"]);
-    data.currentBuildSetting = jsonData["current_build_setting"];
-    data.buildSettings = buildSettingsVectorFromJson(jsonData["build_settings"]);
-
-    return data;
+    return {
+        .name = jsonData["project_name"],
+        .type = projectTypeFromString(jsonData["project_type"]),
+        .dependencies = convertJsonStringArrayToVector(jsonData["project_dependencies"]),
+        .sourceDirectory = jsonData["project_source_directory"],
+        .headerDirectory = jsonData["project_header_directory"],
+        .additionalIncludePaths = convertJsonStringArrayToVector(jsonData["additional_include_paths"]),
+        .currentBuildSetting = jsonData["current_build_setting"],
+        .buildSettings = BuildSetting::vectorFromJson(jsonData["build_settings"]),
+    };
 }
 
 
 
 
 
-static void printStringVector(const std::vector<std::string>& vector)
+ProjectDataManager::ProjectDataManager(const ProjectData& data)
 {
-    for (const std::string& item : vector)
-        std::cout << item << (item != vector.back() ? ", " : "");
+	_projectData = data;
 }
 
 
-void printProjectData(const ProjectData& data)
+ProjectDataManager::ProjectDataManager(const json& jsonData) : ProjectDataManager(ProjectData::fromJson(jsonData))
+{}
+
+
+
+
+void ProjectDataManager::print() const noexcept
 {
-    std::cout << "name: " << data.name << std::endl;
-    std::cout << "type: " << projectTypeToString(data.type) << std::endl;
-    std::cout << "dependencies: " << joinStringVector(data.dependencies, ", ") << std::endl;
+    std::cout << "name: " << _projectData.name << std::endl;
+    std::cout << "type: " << projectTypeToString(_projectData.type) << std::endl;
+    std::cout << "dependencies: " << joinStringVector(_projectData.dependencies, ", ") << std::endl;
 
-    std::cout << "source directory: " << data.sourceDirectory << std::endl;
-    std::cout << "header directory: " << data.headerDirectory << std::endl;
-    std::cout << "additional include paths: " << joinStringVector(data.additionalIncludePaths, ", ") << std::endl;
+    std::cout << "source directory: " << _projectData.sourceDirectory << std::endl;
+    std::cout << "header directory: " << _projectData.headerDirectory << std::endl;
+    std::cout << "additional include paths: " << joinStringVector(_projectData.additionalIncludePaths, ", ") << std::endl;
 
-    std::cout << "current build setting: " << data.currentBuildSetting << std::endl;
-    std::cout << "build settings: " << joinStringVector(getListOfBuildSettingNames(data.buildSettings), ", ") << std::endl;
+    std::cout << "current build setting: " << _projectData.currentBuildSetting << std::endl;
+    std::cout << "build settings: " << joinStringVector(BuildSetting::getBuildSettingNames(_projectData.buildSettings), ", ") << std::endl;
 }
