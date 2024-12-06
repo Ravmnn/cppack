@@ -40,6 +40,12 @@ BuildOptimizationType buildOptimizationTypeFromString(const std::string& source)
 }
 
 
+bool isBuildOptimizationStringValid(const std::string& source) noexcept
+{
+	return buildOptimizationTypeFromString(source) != BuildOptimizationType::Invalid;
+}
+
+
 
 
 
@@ -68,6 +74,12 @@ BuildWarningType buildWarningTypeFromString(const std::string& source)
 }
 
 
+bool isBuildWarningTypeStringValid(const std::string& source) noexcept
+{
+	return buildWarningTypeFromString(source) != BuildWarningType::Invalid;
+}
+
+
 
 
 
@@ -89,6 +101,12 @@ ProjectType projectTypeFromString(const std::string& source)
     if (source == "library")    return ProjectType::Library;
 
     return ProjectType::Executable;
+}
+
+
+bool isProjectTypeStringValid(const std::string& source) noexcept
+{
+	return projectTypeFromString(source) != ProjectType::Invalid;
 }
 
 

@@ -9,6 +9,8 @@ using json = nlohmann::json;
 
 enum class BuildOptimizationType
 {
+	Invalid,
+
     None,
     Low,
     Medium,
@@ -22,11 +24,15 @@ enum class BuildOptimizationType
 std::string buildOptimizationTypeToString(BuildOptimizationType level);
 BuildOptimizationType buildOptimizationTypeFromString(const std::string& source);
 
+bool isBuildOptimizationStringValid(const std::string& source) noexcept;
+
 
 
 
 enum class BuildWarningType
 {
+	Invalid,
+
     None,
     Normal,
     All,
@@ -36,17 +42,23 @@ enum class BuildWarningType
 std::string buildWarningTypeToString(BuildWarningType level);
 BuildWarningType buildWarningTypeFromString(const std::string& source);
 
+bool isBuildWarningTypeStringValid(const std::string& source) noexcept;
+
 
 
 
 enum class ProjectType
 {
+	Invalid,
+
     Executable,
     Library
 };
 
 std::string projectTypeToString(ProjectType type);
 ProjectType projectTypeFromString(const std::string& source);
+
+bool isProjectTypeStringValid(const std::string& source) noexcept;
 
 
 
@@ -104,9 +116,9 @@ public:
 	ProjectDataManager(const json& jsonData);
 
 
-	void set(const ProjectData& data) noexcept { _projectData = data; }
+	void set_data(const ProjectData& data) noexcept { _projectData = data; }
 
-	const ProjectData& get() const noexcept { return _projectData; }
+	const ProjectData& data() const noexcept { return _projectData; }
 
 
 	void print() const noexcept;
