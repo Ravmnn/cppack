@@ -127,6 +127,7 @@ public:
 
 	explicit ProjectDataManager(const ProjectData& data);
 	explicit ProjectDataManager(const json& jsonData);
+	explicit ProjectDataManager(const std::string& path);
 
 
 	const ProjectData& get_data() const noexcept { return _data; }

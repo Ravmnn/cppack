@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include <cppack.hpp>
+#include <project_data.hpp>
 
 
 
@@ -20,17 +21,16 @@ void CommandInit::run() const noexcept
 
 
 
+
+
 CommandInfo::CommandInfo(CLI::App* const app) : Command(app, "info", "Prints information about the current project")
 {}
 
 
 void CommandInfo::run() const noexcept
 {
-	if (!CPPack::currentDirectoryContainsProjectFile())
-	{
-		std::cout << "Current directory isn't a project." << std::endl;
+	if (!CPPack::hasProjectFilePath)
 		return;
-	}
 
-	std::cout << "running info command" << std::endl;
+	ProjectDataManager(CPPack::projectFilePath).print();
 }

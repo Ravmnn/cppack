@@ -1,3 +1,6 @@
+#include <filesystem>
+
+#include <cppack.hpp>
 #include <project_data.hpp>
 #include <commands/commands.hpp>
 
@@ -11,6 +14,8 @@ int main(int argc, char** argv)
 
     new CommandInit(&app);
     new CommandInfo(&app);
+
+    CPPack::init(std::filesystem::current_path());
 
 
     CLI11_PARSE(app, argc, argv)

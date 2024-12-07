@@ -190,11 +190,11 @@ void ProjectData::fromJson(const json& jsonData) noexcept
 {
     // TODO: add default values if value is null
 
-    name = jsonData["project_name"];
-    type = projectTypeFromString(jsonData["project_type"]);
-    dependencies = convertJsonStringArrayToVector(jsonData["project_dependencies"]);
-    sourceDirectory = jsonData["project_source_directory"];
-    headerDirectory = jsonData["project_header_directory"];
+    name = jsonData["name"];
+    type = projectTypeFromString(jsonData["type"]);
+    dependencies = convertJsonStringArrayToVector(jsonData["dependencies"]);
+    sourceDirectory = jsonData["source_directory"];
+    headerDirectory = jsonData["header_directory"];
     additionalIncludePaths = convertJsonStringArrayToVector(jsonData["additional_include_paths"]);
     currentBuildSetting = jsonData["current_build_setting"];
     buildSettings = BuildSetting::vectorFromJson(jsonData["build_settings"]);
@@ -226,6 +226,9 @@ ProjectDataManager::ProjectDataManager(const ProjectData& data) : _data(data)
 ProjectDataManager::ProjectDataManager(const json& jsonData) : ProjectDataManager(ProjectData(jsonData))
 {}
 
+
+ProjectDataManager::ProjectDataManager(const std::string& path) : ProjectDataManager(readJsonFromFile(path))
+{}
 
 
 

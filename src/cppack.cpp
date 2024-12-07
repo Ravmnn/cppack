@@ -3,19 +3,45 @@
 #include <filesystem>
 
 
-namespace stdfs = std::filesystem;
+
+const std::string CPPack::projectFileExtension = ".cpproj";
+
+
+std::string CPPack::projectFilePath = "";
+bool CPPack::hasProjectFilePath = false;
 
 
 
-const std::string CPPack::project_file_extension = ".cpproj";
-
-
-
-bool CPPack::currentDirectoryContainsProjectFile() noexcept
+void CPPack::init(const std::string& path) noexcept
 {
-	for (const auto& file : stdfs::directory_iterator(stdfs::current_path()))
-		if (file.path().extension() == project_file_extension)
-			return true;
+	hasProjectFilePath = directoryHierarchyContainsProjectFile(path, &projectFilePath);
+}
+
+
+
+bool CPPack::directoryContainsProjectFile(const std::string& path, std::string* const projectFilePath) noexcept
+{
+	for (const auto& file : std::filesystem::directory_iterator(path))
+	{
+		if (file.path().extension() != projectFileExtension)
+			continue;
+
+		if (projectFilePath)
+			*projectFilePath = file.path();
+
+		return true;
+	}
 
 	return false;
+}
+
+
+bool CPPack::directoryHierarchyContainsProjectFile(const std::string& path, std::string* const projectFilePath) noexcept
+{
+	const std::filesystem::path ppath = path;
+
+	if (directoryContainsProjectFile(ppath, projectFilePath))
+		return true;
+
+	return ppath != ppath.root_path() ? directoryHierarchyContainsProjectFile(ppath.parent_path(), projectFilePath) : false;
 }
