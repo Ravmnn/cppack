@@ -3,11 +3,11 @@
 #include <iostream>
 
 #include <utility/vector.hpp>
-#include <json.hpp>
+#include <json/json.hpp>
 
 
 
-std::string buildOptimizationTypeToString(const BuildOptimizationType type)
+std::string buildOptimizationTypeToString(const BuildOptimizationType type) noexcept
 {
     switch (type)
     {
@@ -25,7 +25,7 @@ std::string buildOptimizationTypeToString(const BuildOptimizationType type)
 }
 
 
-BuildOptimizationType buildOptimizationTypeFromString(const std::string& source)
+BuildOptimizationType buildOptimizationTypeFromString(const std::string& source) noexcept
 {
     if (source == "none")           return BuildOptimizationType::None;
     if (source == "low")            return BuildOptimizationType::Low;
@@ -49,7 +49,7 @@ bool isBuildOptimizationStringValid(const std::string& source) noexcept
 
 
 
-std::string buildWarningTypeToString(const BuildWarningType type)
+std::string buildWarningTypeToString(const BuildWarningType type) noexcept
 {
     switch (type)
     {
@@ -63,7 +63,7 @@ std::string buildWarningTypeToString(const BuildWarningType type)
 }
 
 
-BuildWarningType buildWarningTypeFromString(const std::string& source)
+BuildWarningType buildWarningTypeFromString(const std::string& source) noexcept
 {
     if (source == "none")   return BuildWarningType::None;
     if (source == "normal") return BuildWarningType::Normal;
@@ -83,7 +83,7 @@ bool isBuildWarningTypeStringValid(const std::string& source) noexcept
 
 
 
-std::string projectTypeToString(const ProjectType type)
+std::string projectTypeToString(const ProjectType type) noexcept
 {
     switch (type)
     {
@@ -95,7 +95,7 @@ std::string projectTypeToString(const ProjectType type)
 }
 
 
-ProjectType projectTypeFromString(const std::string& source)
+ProjectType projectTypeFromString(const std::string& source) noexcept
 {
     if (source == "executable") return ProjectType::Executable;
     if (source == "library")    return ProjectType::Library;
@@ -113,31 +113,45 @@ bool isProjectTypeStringValid(const std::string& source) noexcept
 
 
 
-BuildSetting::BuildSetting(const json& jsonData) noexcept
+const JsonPropertyValidationRequirements BuildSetting::prop_name = { "name", json::value_t::string };
+const JsonPropertyValidationRequirements BuildSetting::prop_optimizationType = { "optimization", json::value_t::string };
+const JsonPropertyValidationRequirements BuildSetting::prop_warningType = {  "warning", json::value_t::string };
+const JsonPropertyValidationRequirements BuildSetting::prop_defines = { "defines", json::value_t::array };
+const JsonPropertyValidationRequirements BuildSetting::prop_additionalOptions = { "additional_options", json::value_t::string };
+
+
+
+BuildSetting::BuildSetting(const json& jsonData)
+	: JsonPropertiesValidator({
+		prop_name, prop_optimizationType, prop_warningType, prop_defines,
+		prop_additionalOptions
+	})
 {
 	fromJson(jsonData);
 }
 
 
 
-void BuildSetting::fromJson(const json& jsonData) noexcept
+void BuildSetting::fromJson(const json& jsonData)
 {
-    name = jsonData["name"];
-    optimizationType = buildOptimizationTypeFromString(jsonData["optimization"]);
-    warningType = buildWarningTypeFromString(jsonData["warning"]);
-    defines = convertJsonStringArrayToVector(jsonData["defines"]);
-    additionalOptions = jsonData["additional_options"];
+	validateProperties(jsonData);
+
+    name = jsonData[prop_name.name];
+    optimizationType = buildOptimizationTypeFromString(jsonData[prop_optimizationType.name]);
+    warningType = buildWarningTypeFromString(jsonData[prop_warningType.name]);
+    defines = convertJsonStringArrayToVector(jsonData[prop_defines.name]);
+    additionalOptions = jsonData[prop_additionalOptions.name];
 }
 
 
 json BuildSetting::toJson() const noexcept
 {
 	return {
-		{ "name", name },
-		{ "optimization", buildOptimizationTypeToString(optimizationType) },
-		{ "warning", buildWarningTypeToString(warningType) },
-		{ "defines", defines },
-		{ "additional_options", additionalOptions }
+		{ prop_name.name, name },
+		{ prop_optimizationType.name, buildOptimizationTypeToString(optimizationType) },
+		{ prop_warningType.name, buildWarningTypeToString(warningType) },
+		{ prop_defines.name, defines },
+		{ prop_additionalOptions.name, additionalOptions }
 	};
 }
 
@@ -154,7 +168,7 @@ json BuildSetting::toJsonArray(const std::vector<BuildSetting>& data) noexcept
 }
 
 
-std::vector<BuildSetting> BuildSetting::vectorFromJson(const json& jsonData) noexcept
+std::vector<BuildSetting> BuildSetting::vectorFromJson(const json& jsonData)
 {
     std::vector<BuildSetting> buildSettings;
 
@@ -179,39 +193,54 @@ std::vector<std::string> BuildSetting::getBuildSettingNames(const std::vector<Bu
 
 
 
-ProjectData::ProjectData(const json& jsonData) noexcept
+const JsonPropertyValidationRequirements ProjectData::prop_name = { "name", json::value_t::string };
+const JsonPropertyValidationRequirements ProjectData::prop_type = { "type", json::value_t::string };
+const JsonPropertyValidationRequirements ProjectData::prop_dependencies = { "dependencies", json::value_t::array };
+const JsonPropertyValidationRequirements ProjectData::prop_sourceDirectory = { "source_directory", json::value_t::string };
+const JsonPropertyValidationRequirements ProjectData::prop_headerDirectory = { "header_directory", json::value_t::string };
+const JsonPropertyValidationRequirements ProjectData::prop_additionalIncludePaths = { "additional_include_paths", json::value_t::array };
+const JsonPropertyValidationRequirements ProjectData::prop_currentBuildSetting = { "current_build_setting", json::value_t::string };
+const JsonPropertyValidationRequirements ProjectData::prop_buildSettings = { "build_settings", json::value_t::array };
+
+
+
+ProjectData::ProjectData(const json& jsonData)
+	: JsonPropertiesValidator({
+		prop_name, prop_type, prop_dependencies, prop_sourceDirectory,
+		prop_headerDirectory, prop_additionalIncludePaths, prop_currentBuildSetting, prop_buildSettings
+	})
 {
 	fromJson(jsonData);
 }
 
 
 
-void ProjectData::fromJson(const json& jsonData) noexcept
+void ProjectData::fromJson(const json& jsonData)
 {
-    // TODO: add default values if value is null
+	validateProperties(jsonData);
 
-    name = jsonData["name"];
-    type = projectTypeFromString(jsonData["type"]);
-    dependencies = convertJsonStringArrayToVector(jsonData["dependencies"]);
-    sourceDirectory = jsonData["source_directory"];
-    headerDirectory = jsonData["header_directory"];
-    additionalIncludePaths = convertJsonStringArrayToVector(jsonData["additional_include_paths"]);
-    currentBuildSetting = jsonData["current_build_setting"];
-    buildSettings = BuildSetting::vectorFromJson(jsonData["build_settings"]);
+    name = jsonData[prop_name.name];
+    type = projectTypeFromString(jsonData[prop_type.name]);
+    dependencies = convertJsonStringArrayToVector(jsonData[prop_dependencies.name]);
+    sourceDirectory = jsonData[prop_sourceDirectory.name];
+    headerDirectory = jsonData[prop_headerDirectory.name];
+    additionalIncludePaths = convertJsonStringArrayToVector(jsonData[prop_additionalIncludePaths.name]);
+    currentBuildSetting = jsonData[prop_currentBuildSetting.name];
+    buildSettings = BuildSetting::vectorFromJson(jsonData[prop_buildSettings.name]);
 }
 
 
 json ProjectData::toJson() const noexcept
 {
 	return {
-		{ "name", name },
-		{ "type", projectTypeToString(type) },
-		{ "dependencies", dependencies },
-		{ "source_directory", sourceDirectory },
-		{ "header_directory", headerDirectory },
-		{ "additional_include_paths", additionalIncludePaths },
-		{ "current_build_setting", currentBuildSetting },
-		{ "build_settings", BuildSetting::toJsonArray(buildSettings) }
+		{ prop_name.name, name },
+		{ prop_type.name, projectTypeToString(type) },
+		{ prop_dependencies.name, dependencies },
+		{ prop_sourceDirectory.name, sourceDirectory },
+		{ prop_headerDirectory.name, headerDirectory },
+		{ prop_additionalIncludePaths.name, additionalIncludePaths },
+		{ prop_currentBuildSetting.name, currentBuildSetting },
+		{ prop_buildSettings.name, BuildSetting::toJsonArray(buildSettings) }
 	};
 }
 

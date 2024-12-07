@@ -1,4 +1,4 @@
-#include <cppack.hpp>
+#include <cppack/cppack.hpp>
 
 #include <filesystem>
 

@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-#include <cppack.hpp>
+#include <cppack/cppack.hpp>
 #include <project_data.hpp>
 
 
@@ -14,7 +14,7 @@ CommandInit::CommandInit(CLI::App* const app) : Command(app, "init", "Creates a 
 }
 
 
-void CommandInit::run() const noexcept
+void CommandInit::run() const
 {
 	std::cout << "running init command" << std::endl;
 }
@@ -27,7 +27,7 @@ CommandInfo::CommandInfo(CLI::App* const app) : Command(app, "info", "Prints inf
 {}
 
 
-void CommandInfo::run() const noexcept
+void CommandInfo::run() const
 {
 	if (!CPPack::hasProjectFilePath)
 		return;

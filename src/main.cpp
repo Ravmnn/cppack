@@ -1,6 +1,7 @@
 #include <filesystem>
 
-#include <cppack.hpp>
+#include <cppack/cppack.hpp>
+#include <cppack/exception.hpp>
 #include <project_data.hpp>
 #include <commands/commands.hpp>
 
@@ -17,8 +18,20 @@ int main(int argc, char** argv)
 
     CPPack::init(std::filesystem::current_path());
 
+    try
+    {
+    	app.parse(argc, argv);
+    }
+    catch (const CPPackException& err)
+    {
+    	std::cout << "Error: " << err.what() << std::endl;
 
-    CLI11_PARSE(app, argc, argv)
+     	return 1;
+    }
+    catch (const CLI::ParseError& e)
+    {
+    	return app.exit(e);
+    }
 
 
     return 0;
