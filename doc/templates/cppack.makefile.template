@@ -1,4 +1,4 @@
-# auto-generated Makefile template
+# This was auto-generated. Don't modify this if you don't know what you are doing
 
 NAME = json:name
 
@@ -16,8 +16,8 @@ BIN_PATH = $(COMPLETE_BUILD_PATH)/$(NAME)
 SOURCES = $(shell find $(SOURCE_PATH) -name "*.cpp")
 OBJECTS = $(addprefix $(OBJECT_PATH)/, $(patsubst $(SOURCE_PATH)/%, %, $(SOURCES:.cpp=.o)))
 
-CPP_COMPILER = json:compiler
-CPP_VERSION = -std=c++json:cppversion
+CPP_COMPILER = json:languageCompiler
+CPP_VERSION = -std=c++json:languageVersion
 
 CPP_OPTIMIZATION = json:[build]:optimization
 CPP_WARNING = json:[build]:warning

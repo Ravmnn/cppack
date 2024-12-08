@@ -5,11 +5,6 @@
 
 
 
-InvalidJsonObjectFormat::InvalidJsonObjectFormat(const std::string& message) : CPPackException(message)
-{}
-
-
-
 void InvalidJsonObjectFormat::throwIfJsonKeyDoesNotExist(const json& jsonData, const std::string& key)
 {
 	if (!jsonData.contains(key))

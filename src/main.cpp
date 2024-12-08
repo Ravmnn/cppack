@@ -1,6 +1,6 @@
 #include <cppack/cppack.hpp>
 #include <cppack/exception.hpp>
-#include <project_data.hpp>
+#include <project_data/project_data.hpp>
 #include <commands/commands.hpp>
 
 
@@ -13,6 +13,7 @@ int main(int argc, char** argv)
 
     new CommandInit(&app);
     new CommandInfo(&app);
+    new CommandBuild(&app);
 
     CPPack::init(std::filesystem::current_path());
 

@@ -132,6 +132,9 @@ public:
     ProjectData();
 
 
+    const BuildSetting* buildSetting() const noexcept;
+
+
     void fromJson(const json& jsonData) override;
     json toJson() const noexcept override;
 };

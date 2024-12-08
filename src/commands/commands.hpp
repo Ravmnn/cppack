@@ -20,12 +20,21 @@ public:
 
 
 
-
-
 class CommandInfo : public Command
 {
 public:
 	CommandInfo(CLI::App* app);
+
+
+	void run() override;
+};
+
+
+
+class CommandBuild : public Command
+{
+public:
+	CommandBuild(CLI::App* app);
 
 
 	void run() override;

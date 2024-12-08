@@ -1,4 +1,4 @@
-#include <project_data.hpp>
+#include <project_data/project_data.hpp>
 
 #include <iostream>
 
@@ -222,6 +222,17 @@ ProjectData::ProjectData(const json& jsonData)
 
 ProjectData::ProjectData() : JsonPropertiesValidator()
 {}
+
+
+
+const BuildSetting* ProjectData::buildSetting() const noexcept
+{
+	for (const BuildSetting& setting : buildSettings)
+		if (setting.name == currentBuildSetting)
+			return &setting;
+
+	return nullptr;
+}
 
 
 

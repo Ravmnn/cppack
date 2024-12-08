@@ -1,7 +1,6 @@
 #include <json/json.hpp>
 
-#include <fstream>
-
+#include <utility/file.hpp>
 #include <json/json_exceptions.hpp>
 
 
@@ -20,16 +19,14 @@ std::vector<std::string> convertJsonStringArrayToVector(const json& array)
 
 json readJsonFromFile(const std::string& path)
 {
-	return json::parse(std::ifstream(path));
+	return json::parse(readFile(path));
 }
 
 
 
 void writeJsonToFile(const json& data, const std::string& path)
 {
-	std::ofstream file(path);
-
-	file << data.dump(2);
+	writeFile(path, data.dump(2));
 }
 
 

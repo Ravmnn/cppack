@@ -9,7 +9,7 @@
 class InvalidJsonObjectFormat : public CPPackException
 {
 public:
-	explicit InvalidJsonObjectFormat(const std::string& message);
+	using CPPackException::CPPackException;
 
 
 	static void throwIfJsonKeyDoesNotExist(const json& jsonData, const std::string& key);

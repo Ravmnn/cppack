@@ -1,6 +1,6 @@
 #pragma once
 
-#include <project_data.hpp>
+#include <project_data/project_data.hpp>
 
 
 
@@ -12,6 +12,7 @@ public:
 
 
 	static const std::string projectFileExtension;
+	static const std::string buildMakefileName;
 
 
 	static std::string projectFilePath;
@@ -29,5 +30,11 @@ public:
 	static BuildSetting generateDefaultBuildSetting(const std::string& name, BuildOptimizationType optimization, BuildWarningType warning) noexcept;
 
 
+	static std::string getBuildMakefilePath(const ProjectData& data) noexcept;
+
 	static void setupProjectEnvironment(const ProjectData& data) noexcept;
+	static void buildProject(const ProjectData& data);
+
+
+	static void generateMakefileFromProjectData(const std::string& fileToSave, const ProjectData& data);
 };

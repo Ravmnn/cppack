@@ -4,9 +4,12 @@
 
 
 
-class ProjectNotFound : public CPPackException
+class InvalidProjectHandlingException : public CPPackException
 {
 public:
-	explicit ProjectNotFound(const std::string& message) : CPPackException(message)
-	{}
+	using CPPackException::CPPackException;
+
+
+	static void throwIfHasNotProjectFile();
+	static void throwIfHasProjectFile();
 };

@@ -1,6 +1,7 @@
 #include <commands/commands.hpp>
 
 #include <cppack/cppack.hpp>
+#include <cppack/cppack_exceptions.hpp>
 
 
 
@@ -13,11 +14,7 @@ CommandInit::CommandInit(CLI::App* const app) : Command(app, "init", "Creates a 
 
 void CommandInit::run()
 {
-	if (CPPack::hasProjectFilePath)
-	{
-		std::cout << "A project configuration file was found. Cannot create another" << std::endl;
-		return;
-	}
+	InvalidProjectHandlingException::throwIfHasProjectFile();
 
 	if (_projectName.empty())
 		_projectName = std::filesystem::current_path().stem().string();
@@ -38,11 +35,22 @@ CommandInfo::CommandInfo(CLI::App* const app) : Command(app, "info", "Prints inf
 
 void CommandInfo::run()
 {
-	if (!CPPack::hasProjectFilePath)
-	{
-		std::cout << "Couldn't find a project configuration file" << std::endl;
-		return;
-	}
+	InvalidProjectHandlingException::throwIfHasNotProjectFile();
 
 	ProjectDataManager(CPPack::projectFilePath).print();
+}
+
+
+
+
+
+CommandBuild::CommandBuild(CLI::App* const app) : Command(app, "build", "Builds the project")
+{}
+
+
+void CommandBuild::run()
+{
+	InvalidProjectHandlingException::throwIfHasNotProjectFile();
+
+	CPPack::buildProject(ProjectDataManager(CPPack::projectFilePath).get_data());
 }
