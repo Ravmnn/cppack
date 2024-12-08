@@ -1,0 +1,39 @@
+# auto-generated Makefile template
+
+NAME = json:name
+
+CURRENT_BUILD_SETTING = json:[build]:name
+
+SOURCE_PATH = json:source_directory
+INCLUDE_PATHS = -I json:header_directory -I json:additional_include_paths...
+BUILD_PATH = json:build_directory
+
+COMPLETE_BUILD_PATH = $(BUILD_PATH)/$(CURRENT_BUILD_SETTING)
+OBJECT_PATH = $(COMPLETE_BUILD_PATH)/obj
+
+BIN_PATH = $(COMPLETE_BUILD_PATH)/$(NAME)
+
+SOURCES = $(shell find $(SOURCE_PATH) -name "*.cpp")
+OBJECTS = $(addprefix $(OBJECT_PATH)/, $(patsubst $(SOURCE_PATH)/%, %, $(SOURCES:.cpp=.o)))
+
+CPP_COMPILER = json:compiler
+CPP_VERSION = -std=c++json:cppversion
+
+CPP_OPTIMIZATION = json:[build]:optimization
+CPP_WARNING = json:[build]:warning
+CPP_DEFINES = -Djson:[build]:defines...
+CPP_ADDITIONAL_OPTIONS = json:[build]:additional_options
+
+CPP_OPTIONS = $(CPP_VERSION) $(CPP_OPTIMIZATION) $(CPP_WARNING) $(CPP_DEFINES) $(CPP_ADDITIONAL_OPTIONS)
+
+
+all build: $(BIN_PATH)
+
+
+$(BIN_PATH): $(OBJECTS)
+	@ $(CPP_COMPILER) $(OBJECTS) -o $(BIN_PATH) $(CPP_OPTIONS)
+
+
+$(OBJECTS): $(OBJECT_PATH)/%.o: $(SOURCE_PATH)/%.cpp
+	@ mkdir $(dir $@) -p
+	@ $(CPP_COMPILER) -c $< -o $@ $(CPP_OPTIONS)

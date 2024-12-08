@@ -8,7 +8,7 @@
     "type": "library",
 
     // the name of the dependencies.
-    "dependencies": ["Dep1", "Dep2", "stdlib"],
+    "dependencies": ["Dep1", "Dep2"],
 
     // path to the directory storing the .cpp/.c files.
     "source_directory": "src",
@@ -17,8 +17,17 @@
     // if not defined, "source_path" will be used.
     "header_directory": "include",
 
+    // name of the directory to be used for storing build files
+    "build_directory": "build,
+
     // additional paths for searching for .hpp/.h files.
     "additional_include_paths": [],
+
+    // the compiler to use
+    "language_compiler": "clang++",
+
+    // 11, 14, 17, 20, 23... any valid C++ version number
+    "language_version": 17,
 
     // current build setting to use when building.
     "current_build_setting": "debug",

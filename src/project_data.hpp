@@ -104,7 +104,10 @@ public:
 	static const JsonPropertyValidationRequirements prop_dependencies;
 	static const JsonPropertyValidationRequirements prop_sourceDirectory;
 	static const JsonPropertyValidationRequirements prop_headerDirectory;
+	static const JsonPropertyValidationRequirements prop_buildDirectory;
 	static const JsonPropertyValidationRequirements prop_additionalIncludePaths;
+	static const JsonPropertyValidationRequirements prop_languageCompiler;
+	static const JsonPropertyValidationRequirements prop_languageVersion;
 	static const JsonPropertyValidationRequirements prop_currentBuildSetting;
 	static const JsonPropertyValidationRequirements prop_buildSettings;
 
@@ -116,7 +119,11 @@ public:
 
     std::string sourceDirectory;
     std::string headerDirectory;
+    std::string buildDirectory;
     std::vector<std::string> additionalIncludePaths;
+
+    std::string languageCompiler;
+    unsigned int languageVersion;
 
     std::string currentBuildSetting;
     std::vector<BuildSetting> buildSettings;

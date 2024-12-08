@@ -1,5 +1,7 @@
 #include <cppack/cppack.hpp>
 
+#include <utility/file.hpp>
+
 
 
 const std::string CPPack::projectFileExtension = ".cpproj";
@@ -60,7 +62,10 @@ ProjectData CPPack::generateDefaultProjectData(const std::string& name, const Pr
 	data.type = type;
 	data.sourceDirectory = "src";
 	data.headerDirectory = (type == ProjectType::Executable ? data.sourceDirectory : "include");
+	data.buildDirectory = "build";
 	data.currentBuildSetting = "debug";
+	data.languageCompiler = "clang++";
+	data.languageVersion = 17,
 	data.buildSettings = {
 		generateDefaultBuildSetting("debug", BuildOptimizationType::Debug, BuildWarningType::All),
 		generateDefaultBuildSetting("release", BuildOptimizationType::High, BuildWarningType::None)
@@ -87,11 +92,9 @@ BuildSetting CPPack::generateDefaultBuildSetting(const std::string& name, const 
 
 void CPPack::setupProjectEnvironment(const ProjectData& data) noexcept
 {
-	if (!std::filesystem::exists(data.sourceDirectory))
-		std::filesystem::create_directory(data.sourceDirectory);
-
-	if (!std::filesystem::exists(data.headerDirectory))
-		std::filesystem::create_directory(data.headerDirectory);
+	createDirectoryIfNotExists(data.sourceDirectory);
+	createDirectoryIfNotExists(data.headerDirectory);
+	createDirectoryIfNotExists(data.buildDirectory);
 
 	ProjectDataManager(data).writeToFile(data.name + CPPack::projectFileExtension);
 }

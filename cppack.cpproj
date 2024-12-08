@@ -1,18 +1,13 @@
 {
 	"name": "cppack",
 	"type": "library",
-	"dependencies": [
-		"Dep1",
-		"Dep2",
-		"stdlib"
-	],
+	"dependencies": [],
 	"source_directory": "src",
 	"header_directory": "include",
-	"additional_include_paths": [
-		"hello, world",
-		"false",
-		"true"
-	],
+	"build_directory": "build",
+	"additional_include_paths": [],
+	"language_compiler": "clang++",
+	"language_version": 17,
 	"current_build_setting": "debug",
 	"build_settings": [
 		{

@@ -1,5 +1,3 @@
-#include <filesystem>
-
 #include <cppack/cppack.hpp>
 #include <cppack/exception.hpp>
 #include <project_data.hpp>

@@ -1,4 +1,3 @@
-#include <cstddef>
 #include <project_data.hpp>
 
 #include <iostream>
@@ -202,7 +201,10 @@ const JsonPropertyValidationRequirements ProjectData::prop_type = { "type", json
 const JsonPropertyValidationRequirements ProjectData::prop_dependencies = { "dependencies", json::value_t::array, json::value_t::string };
 const JsonPropertyValidationRequirements ProjectData::prop_sourceDirectory = { "source_directory", json::value_t::string };
 const JsonPropertyValidationRequirements ProjectData::prop_headerDirectory = { "header_directory", json::value_t::string };
+const JsonPropertyValidationRequirements ProjectData::prop_buildDirectory = { "build_directory", json::value_t::string };
 const JsonPropertyValidationRequirements ProjectData::prop_additionalIncludePaths = { "additional_include_paths", json::value_t::array, json::value_t::string };
+const JsonPropertyValidationRequirements ProjectData::prop_languageCompiler = { "language_compiler", json::value_t::string };
+const JsonPropertyValidationRequirements ProjectData::prop_languageVersion = { "language_version", json::value_t::number_unsigned };
 const JsonPropertyValidationRequirements ProjectData::prop_currentBuildSetting = { "current_build_setting", json::value_t::string };
 const JsonPropertyValidationRequirements ProjectData::prop_buildSettings = { "build_settings", json::value_t::array, json::value_t::object };
 
@@ -232,7 +234,10 @@ void ProjectData::fromJson(const json& jsonData)
     dependencies = convertJsonStringArrayToVector(jsonData[prop_dependencies.name]);
     sourceDirectory = jsonData[prop_sourceDirectory.name];
     headerDirectory = jsonData[prop_headerDirectory.name];
+    buildDirectory = jsonData[prop_buildDirectory.name];
     additionalIncludePaths = convertJsonStringArrayToVector(jsonData[prop_additionalIncludePaths.name]);
+    languageCompiler = jsonData[prop_languageCompiler.name];
+    languageVersion = jsonData[prop_languageVersion.name];
     currentBuildSetting = jsonData[prop_currentBuildSetting.name];
     buildSettings = BuildSetting::vectorFromJson(jsonData[prop_buildSettings.name]);
 }
@@ -246,7 +251,10 @@ json ProjectData::toJson() const noexcept
 		{ prop_dependencies.name, dependencies },
 		{ prop_sourceDirectory.name, sourceDirectory },
 		{ prop_headerDirectory.name, headerDirectory },
+		{ prop_buildDirectory.name, buildDirectory },
 		{ prop_additionalIncludePaths.name, additionalIncludePaths },
+		{ prop_languageCompiler.name, languageCompiler },
+		{ prop_languageVersion.name, languageVersion },
 		{ prop_currentBuildSetting.name, currentBuildSetting },
 		{ prop_buildSettings.name, BuildSetting::toJsonArray(buildSettings) }
 	};
@@ -277,7 +285,11 @@ void ProjectDataManager::print() const noexcept
 
     std::cout << "source directory: " << _data.sourceDirectory << std::endl;
     std::cout << "header directory: " << _data.headerDirectory << std::endl;
+    std::cout << "build directory: " << _data.buildDirectory << std::endl;
     std::cout << "additional include paths: " << joinStringVector(_data.additionalIncludePaths, ", ") << std::endl;
+
+    std::cout << "language compiler: " << _data.languageCompiler << std::endl;
+    std::cout << "language version: " << _data.languageVersion << std::endl;
 
     std::cout << "current build setting: " << _data.currentBuildSetting << std::endl;
     std::cout << "build settings: " << joinStringVector(BuildSetting::getBuildSettingNames(_data.buildSettings), ", ") << std::endl;
