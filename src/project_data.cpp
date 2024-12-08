@@ -116,7 +116,7 @@ bool isProjectTypeStringValid(const std::string& source) noexcept
 const JsonPropertyValidationRequirements BuildSetting::prop_name = { "name", json::value_t::string };
 const JsonPropertyValidationRequirements BuildSetting::prop_optimizationType = { "optimization", json::value_t::string };
 const JsonPropertyValidationRequirements BuildSetting::prop_warningType = {  "warning", json::value_t::string };
-const JsonPropertyValidationRequirements BuildSetting::prop_defines = { "defines", json::value_t::array };
+const JsonPropertyValidationRequirements BuildSetting::prop_defines = { "defines", json::value_t::array, json::value_t::string };
 const JsonPropertyValidationRequirements BuildSetting::prop_additionalOptions = { "additional_options", json::value_t::string };
 
 
@@ -195,12 +195,12 @@ std::vector<std::string> BuildSetting::getBuildSettingNames(const std::vector<Bu
 
 const JsonPropertyValidationRequirements ProjectData::prop_name = { "name", json::value_t::string };
 const JsonPropertyValidationRequirements ProjectData::prop_type = { "type", json::value_t::string };
-const JsonPropertyValidationRequirements ProjectData::prop_dependencies = { "dependencies", json::value_t::array };
+const JsonPropertyValidationRequirements ProjectData::prop_dependencies = { "dependencies", json::value_t::array, json::value_t::string };
 const JsonPropertyValidationRequirements ProjectData::prop_sourceDirectory = { "source_directory", json::value_t::string };
 const JsonPropertyValidationRequirements ProjectData::prop_headerDirectory = { "header_directory", json::value_t::string };
-const JsonPropertyValidationRequirements ProjectData::prop_additionalIncludePaths = { "additional_include_paths", json::value_t::array };
+const JsonPropertyValidationRequirements ProjectData::prop_additionalIncludePaths = { "additional_include_paths", json::value_t::array, json::value_t::string };
 const JsonPropertyValidationRequirements ProjectData::prop_currentBuildSetting = { "current_build_setting", json::value_t::string };
-const JsonPropertyValidationRequirements ProjectData::prop_buildSettings = { "build_settings", json::value_t::array };
+const JsonPropertyValidationRequirements ProjectData::prop_buildSettings = { "build_settings", json::value_t::array, json::value_t::object };
 
 
 

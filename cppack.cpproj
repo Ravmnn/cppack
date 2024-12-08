@@ -8,7 +8,11 @@
 	],
 	"source_directory": "src",
 	"header_directory": "include",
-	"additional_include_paths": [],
+	"additional_include_paths": [
+		"hello, world",
+		"false",
+		"true"
+	],
 	"current_build_setting": "debug",
 	"build_settings": [
 		{

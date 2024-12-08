@@ -15,6 +15,10 @@ void writeJsonToFile(const json& data, const std::string& path);
 
 
 
+std::string jsonTypeToString(json::value_t type) noexcept;
+
+
+
 class JsonConversible
 {
 public:
@@ -28,6 +32,8 @@ struct JsonPropertyValidationRequirements
 {
 	std::string name;
 	json::value_t type;
+
+	json::value_t arrayItemType = json::value_t::null;
 };
 
 
