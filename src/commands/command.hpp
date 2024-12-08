@@ -27,5 +27,5 @@ public:
 	const std::string& get_description() const noexcept { return description; }
 
 
-	virtual void run() const = 0;
+	virtual void run() = 0;
 };

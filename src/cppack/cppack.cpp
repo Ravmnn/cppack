@@ -1,7 +1,5 @@
 #include <cppack/cppack.hpp>
 
-#include <filesystem>
-
 
 
 const std::string CPPack::projectFileExtension = ".cpproj";
@@ -12,10 +10,14 @@ bool CPPack::hasProjectFilePath = false;
 
 
 
+
+
 void CPPack::init(const std::string& path) noexcept
 {
 	hasProjectFilePath = directoryHierarchyContainsProjectFile(path, &projectFilePath);
 }
+
+
 
 
 
@@ -44,4 +46,52 @@ bool CPPack::directoryHierarchyContainsProjectFile(const std::string& path, std:
 		return true;
 
 	return ppath != ppath.root_path() ? directoryHierarchyContainsProjectFile(ppath.parent_path(), projectFilePath) : false;
+}
+
+
+
+
+
+ProjectData CPPack::generateDefaultProjectData(const std::string& name, const ProjectType type) noexcept
+{
+	ProjectData data;
+
+	data.name = name;
+	data.type = type;
+	data.sourceDirectory = "src";
+	data.headerDirectory = (type == ProjectType::Executable ? data.sourceDirectory : "include");
+	data.currentBuildSetting = "debug";
+	data.buildSettings = {
+		generateDefaultBuildSetting("debug", BuildOptimizationType::Debug, BuildWarningType::All),
+		generateDefaultBuildSetting("release", BuildOptimizationType::High, BuildWarningType::None)
+	};
+
+	return data;
+}
+
+
+BuildSetting CPPack::generateDefaultBuildSetting(const std::string& name, const BuildOptimizationType optimization, const BuildWarningType warning) noexcept
+{
+	BuildSetting setting;
+
+	setting.name = name;
+	setting.optimizationType = optimization;
+	setting.warningType = warning;
+
+	return setting;
+}
+
+
+
+
+
+void CPPack::setupProjectEnvironment(const ProjectData& data) noexcept
+{
+	if (!std::filesystem::exists(data.sourceDirectory))
+		std::filesystem::create_directory(data.sourceDirectory);
+
+	if (!std::filesystem::exists(data.headerDirectory))
+		std::filesystem::create_directory(data.headerDirectory);
+
+	ProjectDataManager(data).writeToFile(data.name + CPPack::projectFileExtension);
 }

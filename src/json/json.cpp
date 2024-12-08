@@ -2,7 +2,6 @@
 
 #include <fstream>
 
-#include <project_data.hpp>
 #include <json/json_exceptions.hpp>
 
 
@@ -30,7 +29,7 @@ void writeJsonToFile(const json& data, const std::string& path)
 {
 	std::ofstream file(path);
 
-	file << data.dump(4);
+	file << data.dump(2);
 }
 
 

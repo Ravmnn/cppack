@@ -5,9 +5,6 @@
 #include <cppack/exception.hpp>
 
 
-using json = nlohmann::json;
-
-
 
 class InvalidJsonObjectFormat : public CPPackException
 {

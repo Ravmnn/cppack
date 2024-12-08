@@ -1,3 +1,5 @@
+# TODO: add release and debug folders; update symlink to release
+
 MAKEFLAGS += -j4
 
 SOURCE_PATH = src

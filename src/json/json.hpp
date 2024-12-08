@@ -3,7 +3,7 @@
 #include <nlohmann_json.hpp>
 
 
-using json = nlohmann::json;
+using json = nlohmann::ordered_json;
 
 
 
@@ -44,12 +44,9 @@ protected:
 
 
 public:
-	JsonPropertiesValidator() = delete;
-
-
 	virtual void validateProperties(const json& jsonData) const;
 
 
 protected:
-	explicit JsonPropertiesValidator(const std::vector<JsonPropertyValidationRequirements>& propertiesRequirements) noexcept;
+	JsonPropertiesValidator(const std::vector<JsonPropertyValidationRequirements>& propertiesRequirements = {}) noexcept;
 };

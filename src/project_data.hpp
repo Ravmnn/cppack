@@ -3,9 +3,6 @@
 #include <json/json.hpp>
 
 
-using json = nlohmann::json;
-
-
 
 enum class BuildOptimizationType
 {
@@ -84,6 +81,7 @@ public:
 
 
     explicit BuildSetting(const json& jsonData);
+    BuildSetting();
 
 
     void fromJson(const json& jsonData) override;
@@ -123,8 +121,8 @@ public:
     std::string currentBuildSetting;
     std::vector<BuildSetting> buildSettings;
 
-
     explicit ProjectData(const json& jsonData);
+    ProjectData();
 
 
     void fromJson(const json& jsonData) override;

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <string>
+#include <project_data.hpp>
 
 
 
@@ -23,4 +23,11 @@ public:
 
 	static bool directoryContainsProjectFile(const std::string& path, std::string* projectFilePath = nullptr) noexcept;
 	static bool directoryHierarchyContainsProjectFile(const std::string& path, std::string* projectFilePath = nullptr) noexcept;
+
+
+	static ProjectData generateDefaultProjectData(const std::string& name, ProjectType type) noexcept;
+	static BuildSetting generateDefaultBuildSetting(const std::string& name, BuildOptimizationType optimization, BuildWarningType warning) noexcept;
+
+
+	static void setupProjectEnvironment(const ProjectData& data) noexcept;
 };

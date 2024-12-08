@@ -15,7 +15,7 @@ public:
 	CommandInit(CLI::App* app);
 
 
-	void run() const override;
+	void run() override;
 };
 
 
@@ -28,5 +28,5 @@ public:
 	CommandInfo(CLI::App* app);
 
 
-	void run() const override;
+	void run() override;
 };

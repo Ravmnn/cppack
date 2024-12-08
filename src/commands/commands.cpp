@@ -1,9 +1,6 @@
 #include <commands/commands.hpp>
 
-#include <iostream>
-
 #include <cppack/cppack.hpp>
-#include <project_data.hpp>
 
 
 
@@ -14,9 +11,21 @@ CommandInit::CommandInit(CLI::App* const app) : Command(app, "init", "Creates a 
 }
 
 
-void CommandInit::run() const
+void CommandInit::run()
 {
-	std::cout << "running init command" << std::endl;
+	if (CPPack::hasProjectFilePath)
+	{
+		std::cout << "A project configuration file was found. Cannot create another" << std::endl;
+		return;
+	}
+
+	if (_projectName.empty())
+		_projectName = std::filesystem::current_path().stem().string();
+
+	const ProjectData data = CPPack::generateDefaultProjectData(_projectName, projectTypeFromString(_projectType));
+	CPPack::setupProjectEnvironment(data);
+
+	std::cout << "Project created: " << data.name << std::endl;
 }
 
 
@@ -27,10 +36,13 @@ CommandInfo::CommandInfo(CLI::App* const app) : Command(app, "info", "Prints inf
 {}
 
 
-void CommandInfo::run() const
+void CommandInfo::run()
 {
 	if (!CPPack::hasProjectFilePath)
+	{
+		std::cout << "Couldn't find a project configuration file" << std::endl;
 		return;
+	}
 
 	ProjectDataManager(CPPack::projectFilePath).print();
 }

@@ -1,9 +1,9 @@
+#include <cstddef>
 #include <project_data.hpp>
 
 #include <iostream>
 
 #include <utility/vector.hpp>
-#include <json/json.hpp>
 
 
 
@@ -131,6 +131,10 @@ BuildSetting::BuildSetting(const json& jsonData)
 }
 
 
+BuildSetting::BuildSetting() : JsonPropertiesValidator()
+{}
+
+
 
 void BuildSetting::fromJson(const json& jsonData)
 {
@@ -159,10 +163,10 @@ json BuildSetting::toJson() const noexcept
 
 json BuildSetting::toJsonArray(const std::vector<BuildSetting>& data) noexcept
 {
-	json jsonData;
+	json jsonData = json::array();
 
-	for (const BuildSetting& setting : data)
-		jsonData[setting.name] = setting.toJson();
+	for (size_t i = 0; i < data.size(); i++)
+		jsonData[i] = data[i].toJson();
 
 	return jsonData;
 }
@@ -212,6 +216,10 @@ ProjectData::ProjectData(const json& jsonData)
 {
 	fromJson(jsonData);
 }
+
+
+ProjectData::ProjectData() : JsonPropertiesValidator()
+{}
 
 
 
