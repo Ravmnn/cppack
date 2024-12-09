@@ -7,7 +7,7 @@
 	"build_directory": "build",
 	"additional_include_paths": [],
 	"language_compiler": "clang++",
-	"language_version": 17,
+	"language_version": 20,
 	"current_build_setting": "debug",
 	"build_settings": [
 		{

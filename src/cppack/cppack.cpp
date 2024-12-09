@@ -212,7 +212,7 @@ ProjectData CPPack::generateDefaultProjectData(const std::string& name, const Pr
 	data.buildDirectory = "build";
 	data.currentBuildSetting = "debug";
 	data.languageCompiler = "clang++";
-	data.languageVersion = 17,
+	data.languageVersion = 20,
 	data.buildSettings = {
 		generateDefaultBuildSetting("debug", BuildOptimizationType::Debug, BuildWarningType::All),
 		generateDefaultBuildSetting("release", BuildOptimizationType::High, BuildWarningType::None)
