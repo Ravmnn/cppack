@@ -5,7 +5,8 @@
 
 
 
-CommandProjectInit::CommandProjectInit(CPPack* const cppack, CLI::App* const app) : Command(cppack, app, "init", "Creates a new project")
+CommandProjectInit::CommandProjectInit(CPPack* const cppack, CLI::App* const app)
+	: Command(cppack, app, "init", "Creates a new project")
 {
 	thisCommand->add_option("projectType", _projectType)->required();
     thisCommand->add_option("projectName", _projectName);
@@ -26,7 +27,8 @@ void CommandProjectInit::run()
 
 
 
-CommandProjectInfo::CommandProjectInfo(CPPack* const cppack, CLI::App* const app) : Command(cppack, app, "info", "Prints information about the current project")
+CommandProjectInfo::CommandProjectInfo(CPPack* const cppack, CLI::App* const app)
+	: Command(cppack, app, "info", "Prints information about the current project")
 {}
 
 
@@ -41,7 +43,8 @@ void CommandProjectInfo::run()
 
 
 
-CommandProjectBuild::CommandProjectBuild(CPPack* const cppack, CLI::App* const app) : Command(cppack, app, "build", "Builds the project")
+CommandProjectBuild::CommandProjectBuild(CPPack* const cppack, CLI::App* const app)
+	: Command(cppack, app, "build", "Builds the project")
 {}
 
 
@@ -56,7 +59,8 @@ void CommandProjectBuild::run()
 
 
 
-CommandProjectRun::CommandProjectRun(CPPack* const cppack, CLI::App* const app) : Command(cppack, app, "run", "Runs the project, if possible")
+CommandProjectRun::CommandProjectRun(CPPack* const cppack, CLI::App* const app)
+	: Command(cppack, app, "run", "Runs the project, if possible")
 {}
 
 
@@ -71,7 +75,8 @@ void CommandProjectRun::run()
 
 
 
-CommandProjectClean::CommandProjectClean(CPPack* const cppack, CLI::App* const app) : Command(cppack, app, "clean", "Deletes build files")
+CommandProjectClean::CommandProjectClean(CPPack* const cppack, CLI::App* const app)
+	: Command(cppack, app, "clean", "Deletes build files")
 {}
 
 

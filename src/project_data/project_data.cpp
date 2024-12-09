@@ -1,3 +1,4 @@
+#include "json/json.hpp"
 #include <project_data/project_data.hpp>
 
 #include <iostream>
@@ -285,10 +286,6 @@ ProjectDataManager::ProjectDataManager(const json& jsonData) : ProjectDataManage
 {}
 
 
-ProjectDataManager::ProjectDataManager(const std::string& path) : ProjectDataManager(readJsonFromFile(path))
-{}
-
-
 
 void ProjectDataManager::print() const noexcept
 {
@@ -310,13 +307,13 @@ void ProjectDataManager::print() const noexcept
 
 
 
-void ProjectDataManager::writeToFile(const std::string& path) const
+void ProjectDataManager::writeToFile(const ProjectData& data, const std::string& path)
 {
-	writeJsonToFile(_data.toJson(), path);
+	writeJsonToFile(data.toJson(), path);
 }
 
 
-void ProjectDataManager::readFromFile(const std::string& path)
+ProjectDataManager ProjectDataManager::readFromFile(const std::string& path)
 {
-	_data.fromJson(readJsonFromFile(path));
+	return ProjectDataManager(readJsonFromFile(path));
 }

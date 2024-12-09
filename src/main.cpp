@@ -1,8 +1,14 @@
-#include <utility/file.hpp>
 #include <cppack/cppack.hpp>
 #include <cppack/exception.hpp>
 #include <commands/project.hpp>
 #include <commands/index.hpp>
+#include <commands/package.hpp>
+
+
+
+// TODO: improve exception messages
+// TODO: add exception when building project with no source files
+// TODO: add a better way of throwing a exception if there's no project configuration file
 
 
 
@@ -27,8 +33,14 @@ int main(int argc, char** argv)
 
     new CommandIndexRegister(&cppack, index);
     new CommandIndexUnregister(&cppack, index);
-    new CommandIndexExist(&cppack, index);
     new CommandIndexList(&cppack, index);
+
+    CLI::App* package = app.add_subcommand("package", "Subcommands for handling the project package dependencies");
+
+    new CommandPackageAdd(&cppack, package);
+    new CommandPackageRemove(&cppack, package);
+    new CommandPackageList(&cppack, package);
+
 
     try
     {

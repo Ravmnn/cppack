@@ -1,7 +1,7 @@
 #include <cppack/cppack.hpp>
 
-#include <filesystem>
 #include <utility/file.hpp>
+#include <utility/vector.hpp>
 #include <project_data/project_data_exceptions.hpp>
 #include <make/make_generator.hpp>
 #include <make/compiler_options.hpp>
@@ -25,9 +25,6 @@ CPPack::CPPack(const std::string& path)
 		throw InvalidProjectHandlingException("Invalid path: " + path);
 
 	_hasProjectFilePath = directoryHierarchyContainsProjectFile(path, &_projectFilePath);
-
-	if (_hasProjectFilePath)
-		_data = ProjectDataManager(_projectFilePath).getData();
 }
 
 
@@ -36,7 +33,7 @@ CPPack::CPPack(const std::string& path)
 
 std::string CPPack::getBuildMakefilePath() const noexcept
 {
-	return fs::path(_data.buildDirectory).append(buildMakefileName);
+	return fs::path(getData().buildDirectory).append(buildMakefileName);
 }
 
 
@@ -45,16 +42,18 @@ std::string CPPack::getBuildMakefilePath() const noexcept
 
 void CPPack::buildProject() const
 {
-	createDirectoryIfNotExists(_data.buildDirectory);
+	const ProjectData projectData = getData();
 
-	generateMakefileFromProjectData(getBuildMakefilePath(), _data);
+	createDirectoryIfNotExists(projectData.buildDirectory);
+
+	generateMakefileFromProjectData(getBuildMakefilePath(), projectData);
 	runProjectMakefile("build");
 }
 
 
 void CPPack::runProject() const
 {
-	if (_data.type != ProjectType::Executable)
+	if (getData().type != ProjectType::Executable)
 		throw InvalidProjectHandlingException("Project type is not runnable");
 
 	buildProject();
@@ -64,7 +63,7 @@ void CPPack::runProject() const
 
 void CPPack::cleanProject() const
 {
-	fs::remove_all(_data.buildDirectory);
+	fs::remove_all(getData().buildDirectory);
 }
 
 
@@ -83,6 +82,39 @@ void CPPack::runProjectMakefile(const std::string& makeRule) const
 
 
 
+void CPPack::addPackageDependency(const std::string& name) const
+{
+	InvalidPackageIndexHandling::throwIfNotRegistered(name);
+	InvalidPackageIndexHandling::throwIfIsDependency(*this, name);
+
+	ProjectData projectData = getData();
+	projectData.dependencies.push_back(name);
+
+	ProjectDataManager::writeToFile(projectData, getProjectFilePath());
+}
+
+
+void CPPack::removePackageDependency(const std::string& name) const
+{
+	InvalidPackageIndexHandling::throwIfIsNotDependency(*this, name);
+
+	ProjectData data = getData();
+	data.dependencies.erase(find(data.dependencies, name));
+
+	ProjectDataManager::writeToFile(data, getProjectFilePath());
+}
+
+
+bool CPPack::isPackageADependency(const std::string& name) const noexcept
+{
+	const ProjectData data = getData();
+	return find(data.dependencies, name) != data.dependencies.cend();
+}
+
+
+
+
+
 void CPPack::init() noexcept
 {
 	setupCppackGlobalEnvironment();
@@ -92,13 +124,10 @@ void CPPack::init() noexcept
 
 
 
-static void copyPackageToIndex(const CPPack& cppack)
+static void copyPackageToGlobalPackageIndex(const CPPack& package)
 {
-	const fs::path packagePath = fs::absolute(cppack.getProjectFilePath()).parent_path();
-	const fs::path targetPath = CPPack::cppackIndexDirectoryPath / cppack.getData().name;
-
-	if (!fs::exists(packagePath))
-		throw InvalidPackageIndexHandling("Invalid package path");
+	const fs::path packagePath = fs::absolute(package.getProjectFilePath()).parent_path();
+	const fs::path targetPath = CPPack::cppackIndexDirectoryPath / package.getData().name;
 
 	fs::create_directory(targetPath);
 
@@ -111,20 +140,18 @@ void CPPack::registerPackage(const CPPack& package)
 {
 	const ProjectData& packageData = package.getData();
 
-	if (isPackageRegistered(packageData.name))
-		throw InvalidPackageIndexHandling("Package is already registered");
+	InvalidPackageIndexHandling::throwIfRegistered(packageData.name);
 
 	if (packageData.type == ProjectType::Executable)
 		throw InvalidPackageIndexHandling("Cannot register a executable type package");
 
-	copyPackageToIndex(package);
+	copyPackageToGlobalPackageIndex(package);
 }
 
 
 void CPPack::unregisterPackage(const std::string& name)
 {
-	if (!isPackageRegistered(name))
-		throw InvalidPackageIndexHandling("Package is not registered");
+	InvalidPackageIndexHandling::throwIfNotRegistered(name);
 
 	fs::remove_all(cppackIndexDirectoryPath / name);
 }
@@ -215,7 +242,7 @@ void CPPack::setupProjectEnvironment(const ProjectData& data) noexcept
 	createDirectoryIfNotExists(data.sourceDirectory);
 	createDirectoryIfNotExists(data.headerDirectory);
 
-	ProjectDataManager(data).writeToFile(data.name + CPPack::projectFileExtension);
+	ProjectDataManager::writeToFile(data, data.name + CPPack::projectFileExtension);
 }
 
 

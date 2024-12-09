@@ -1,5 +1,6 @@
 #pragma once
 
+#include "cppack/cppack.hpp"
 #include <cppack/exception.hpp>
 
 
@@ -23,4 +24,11 @@ class InvalidPackageIndexHandling : public CPPackException
 {
 public:
 	using CPPackException::CPPackException;
+
+
+	static void throwIfRegistered(const std::string& name);
+	static void throwIfNotRegistered(const std::string& name);
+
+	static void throwIfIsDependency(const CPPack& project, const std::string& dependencyName);
+	static void throwIfIsNotDependency(const CPPack& project, const std::string& dependencyName);
 };

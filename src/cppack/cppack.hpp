@@ -11,8 +11,6 @@ private:
 	std::string _projectFilePath;
 	bool _hasProjectFilePath;
 
-	ProjectData _data;
-
 
 public:
 	static const fs::path cppackDirectoryPath;
@@ -27,7 +25,9 @@ public:
 
 	const std::string& getProjectFilePath() const noexcept { return _projectFilePath; }
 	bool hasProjectFilePath() const noexcept { return _hasProjectFilePath; }
-	const ProjectData& getData() const noexcept { return _data; }
+
+
+	ProjectData getData() const { return ProjectDataManager::readFromFile(_projectFilePath).getData(); }
 
 
 	std::string getBuildMakefilePath() const noexcept;
@@ -39,10 +39,15 @@ public:
 	void runProjectMakefile(const std::string& makeRule) const;
 
 
+	void addPackageDependency(const std::string& name) const;
+	void removePackageDependency(const std::string& name) const;
+	bool isPackageADependency(const std::string& name) const noexcept;
+
+
 	static void init() noexcept;
 
 
-	static void registerPackage(const CPPack& package);
+	static void registerPackage(const CPPack& project);
 	static void unregisterPackage(const std::string& name);
 	static bool isPackageRegistered(const std::string& name) noexcept;
 

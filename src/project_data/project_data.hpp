@@ -153,7 +153,6 @@ public:
 
 	explicit ProjectDataManager(const ProjectData& data);
 	explicit ProjectDataManager(const json& jsonData);
-	explicit ProjectDataManager(const std::string& path);
 
 
 	const ProjectData& getData() const noexcept { return _data; }
@@ -164,6 +163,6 @@ public:
 	void print() const noexcept;
 
 
-	void writeToFile(const std::string& path) const;
-	void readFromFile(const std::string& path);
+	static void writeToFile(const ProjectData& data, const std::string& path);
+	static ProjectDataManager readFromFile(const std::string& path);
 };

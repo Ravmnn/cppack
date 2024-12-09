@@ -1,6 +1,5 @@
 #include <cppack/cppack_exceptions.hpp>
 
-#include <utility/file.hpp>
 #include <cppack/cppack.hpp>
 
 
@@ -28,4 +27,34 @@ void InvalidProjectHandlingException::throwIfHasNotProjectFile()
 void InvalidProjectHandlingException::throwIfHasProjectFile()
 {
 	throwIfHasProjectFile(fs::current_path());
+}
+
+
+
+
+
+void InvalidPackageIndexHandling::throwIfRegistered(const std::string& name)
+{
+	if (CPPack::isPackageRegistered(name))
+		throw InvalidPackageIndexHandling("Package is registered");
+}
+
+
+void InvalidPackageIndexHandling::throwIfNotRegistered(const std::string& name)
+{
+	if (!CPPack::isPackageRegistered(name))
+		throw InvalidPackageIndexHandling("Package is not registered");
+}
+
+void InvalidPackageIndexHandling::throwIfIsDependency(const CPPack& project, const std::string& dependencyName)
+{
+	if (project.isPackageADependency(dependencyName))
+		throw InvalidPackageIndexHandling("Package is a dependency");
+}
+
+
+void InvalidPackageIndexHandling::throwIfIsNotDependency(const CPPack& project, const std::string& dependencyName)
+{
+	if (!project.isPackageADependency(dependencyName))
+		throw InvalidPackageIndexHandling("Package is not a dependency");
 }

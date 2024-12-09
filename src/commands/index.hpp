@@ -34,21 +34,6 @@ public:
 
 
 
-class CommandIndexExist : public Command
-{
-private:
-	std::string _packageName;
-
-
-public:
-	CommandIndexExist(CPPack* cppack, CLI::App* app);
-
-
-	void run() override;
-};
-
-
-
 class CommandIndexList : public Command
 {
 public:
