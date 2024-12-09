@@ -1,9 +1,29 @@
-# TODO: add release and debug folders; update symlink to release
-
 MAKEFLAGS += -j4
 
 SOURCE_PATH = src
 BUILD_PATH = build
+
+
+# debug / release
+MODE = debug
+
+ifeq ($(MODE),debug)
+
+	WARNING_FLAGS = -Wall -Wextra
+	OPTMIZATION_FLAGS = -Og
+
+	BUILD_PATH = build/debug
+
+else ifeq ($(MODE),release)
+
+	WARNING_FLAGS = -w
+	OPTMIZATION_FLAGS = -O3 -flto
+
+	BUILD_PATH = build/release
+
+endif
+
+
 OBJECT_PATH = $(BUILD_PATH)/obj
 
 DEPS_PATH = deps
@@ -15,21 +35,6 @@ WARNING_FLAGS =
 OPTMIZATION_FLAGS =
 INCLUDES = -I $(DEPS_PATH) -I $(SOURCE_PATH)
 
-
-# debug / release
-MODE = debug
-
-ifeq ($(MODE),debug)
-
-	WARNING_FLAGS = -Wall -Wextra
-	OPTMIZATION_FLAGS = -Og
-
-else ifeq ($(MODE),release)
-
-	WARNING_FLAGS = -w
-	OPTMIZATION_FLAGS = -O3 -flto
-
-endif
 
 CFLAGS = $(WARNING_FLAGS) $(OPTMIZATION_FLAGS) $(INCLUDES) $(CPPVERSION)
 
