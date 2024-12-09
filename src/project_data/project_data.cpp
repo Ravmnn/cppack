@@ -87,7 +87,8 @@ std::string projectTypeToString(const ProjectType type) noexcept
     switch (type)
     {
         case ProjectType::Executable: return "executable";
-        case ProjectType::Library:    return "library";
+        case ProjectType::StaticLibrary: return "static-library";
+        case ProjectType::SharedLibrary: return "shared-library";
 
         default: return "invalid";
     }
@@ -97,7 +98,8 @@ std::string projectTypeToString(const ProjectType type) noexcept
 ProjectType projectTypeFromString(const std::string& source) noexcept
 {
     if (source == "executable") return ProjectType::Executable;
-    if (source == "library")    return ProjectType::Library;
+	if (source == "static-library") return ProjectType::StaticLibrary;
+	if (source == "shared-library") return ProjectType::SharedLibrary;
 
     return ProjectType::Executable;
 }

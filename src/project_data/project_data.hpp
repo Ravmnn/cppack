@@ -49,7 +49,8 @@ enum class ProjectType
 	Invalid,
 
     Executable,
-    Library
+    StaticLibrary,
+    SharedLibrary
 };
 
 std::string projectTypeToString(ProjectType type) noexcept;

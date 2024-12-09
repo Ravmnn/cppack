@@ -1,3 +1,4 @@
+#include "project_data/project_data.hpp"
 #include <cppack/cppack.hpp>
 
 #include <utility/file.hpp>
@@ -111,6 +112,32 @@ const std::string CPPack::makefileBuildRuleName = "build";
 
 
 
+static std::string getMakefileCommandForLinkingProjectOfType(const ProjectType type) noexcept
+{
+	switch (type)
+	{
+		case ProjectType::Executable: return (std::string)"$(CPP_COMPILER) $(OBJECTS) -o $(BIN_PATH) $(CPP_OPTIONS)";
+		case ProjectType::StaticLibrary: return (std::string)"ar rcs $(BIN_PATH) $(OBJECTS)";
+		case ProjectType::SharedLibrary: return (std::string)"$(CPP_COMPILER) $(OBJECTS) -o $(BIN_PATH) -shared -fPIC $(CPP_OPTIONS)";
+
+		default: return "invalid";
+	}
+}
+
+
+static std::string getMakefileOutFileExtensionForProjectOfType(const ProjectType type) noexcept
+{
+	switch (type)
+	{
+		case ProjectType::Executable: return "";
+		case ProjectType::StaticLibrary: return ".a";
+		case ProjectType::SharedLibrary: return ".so";
+
+		default: return "";
+	}
+}
+
+
 void CPPack::generateMakefileFromProjectData(const std::string& fileToSave, const ProjectData& data)
 {
 	const BuildSetting* buildSetting = data.buildSetting();
@@ -131,7 +158,7 @@ void CPPack::generateMakefileFromProjectData(const std::string& fileToSave, cons
 	make.variableAdd("MAKEFLAGS", "-j4");
 	make.newline();
 
-	make.variable("NAME", data.name);
+	make.variable("NAME", data.name + getMakefileOutFileExtensionForProjectOfType(data.type));
 	make.newline();
 
 	make.variable("CURRENT_BUILD_SETTING", data.currentBuildSetting);
@@ -174,7 +201,7 @@ void CPPack::generateMakefileFromProjectData(const std::string& fileToSave, cons
 	make.newline(2);
 
 	make.rule("$(BIN_PATH)", "$(OBJECTS)");
-		make.ruleCommand("$(CPP_COMPILER) $(OBJECTS) -o $(BIN_PATH) $(CPP_OPTIONS)");
+		make.ruleCommand(getMakefileCommandForLinkingProjectOfType(data.type));
 	make.newline(2);
 
 	make.patternRule("$(OBJECTS)", "$(OBJECT_PATH)/%.o", "$(SOURCE_PATH)/%.cpp");
