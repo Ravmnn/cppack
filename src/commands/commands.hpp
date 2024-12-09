@@ -39,3 +39,25 @@ public:
 
 	void run() override;
 };
+
+
+
+class CommandRun : public Command
+{
+public:
+	CommandRun(CLI::App* app);
+
+
+	void run() override;
+};
+
+
+
+class CommandClean : public Command
+{
+public:
+	CommandClean(CLI::App* app);
+
+
+	void run() override;
+};

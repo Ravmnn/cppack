@@ -7,17 +7,14 @@
 
 CommandInit::CommandInit(CLI::App* const app) : Command(app, "init", "Creates a new project")
 {
-	thisCommand->add_option("project_type", _projectType)->required();
-    thisCommand->add_option("project_name", _projectName);
+	thisCommand->add_option("projectType", _projectType)->required();
+    thisCommand->add_option("projectName", _projectName);
 }
 
 
 void CommandInit::run()
 {
 	InvalidProjectHandlingException::throwIfHasProjectFile();
-
-	if (_projectName.empty())
-		_projectName = std::filesystem::current_path().stem().string();
 
 	const ProjectData data = CPPack::generateDefaultProjectData(_projectName, projectTypeFromString(_projectType));
 	CPPack::setupProjectEnvironment(data);
@@ -52,5 +49,35 @@ void CommandBuild::run()
 {
 	InvalidProjectHandlingException::throwIfHasNotProjectFile();
 
-	CPPack::buildProject(ProjectDataManager(CPPack::projectFilePath).get_data());
+	CPPack::buildProject(CPPack::getProjectDataFromCurrentProject());
+}
+
+
+
+
+
+CommandRun::CommandRun(CLI::App* const app) : Command(app, "run", "Runs the project, if possible")
+{}
+
+
+void CommandRun::run()
+{
+	InvalidProjectHandlingException::throwIfHasNotProjectFile();
+
+	CPPack::runProject(CPPack::getProjectDataFromCurrentProject());
+}
+
+
+
+
+
+CommandClean::CommandClean(CLI::App* const app) : Command(app, "clean", "Deletes build files")
+{}
+
+
+void CommandClean::run()
+{
+	InvalidProjectHandlingException::throwIfHasNotProjectFile();
+
+	CPPack::cleanProject(CPPack::getProjectDataFromCurrentProject());
 }
