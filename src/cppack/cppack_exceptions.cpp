@@ -1,18 +1,31 @@
 #include <cppack/cppack_exceptions.hpp>
 
+#include <utility/file.hpp>
 #include <cppack/cppack.hpp>
 
 
 
+void InvalidProjectHandlingException::throwIfHasNotProjectFile(const std::string& path)
+{
+	if (!CPPack::directoryHierarchyContainsProjectFile(path))
+		throw InvalidProjectHandlingException("Couldn't find a project configuration file");
+}
+
+
+void InvalidProjectHandlingException::throwIfHasProjectFile(const std::string& path)
+{
+	if (CPPack::directoryHierarchyContainsProjectFile(path))
+		throw InvalidProjectHandlingException("A project configuration file was found");
+}
+
+
 void InvalidProjectHandlingException::throwIfHasNotProjectFile()
 {
-	if (!CPPack::hasProjectFilePath)
-		throw InvalidProjectHandlingException("Couldn't find a project configuration file");
+	throwIfHasNotProjectFile(fs::current_path());
 }
 
 
 void InvalidProjectHandlingException::throwIfHasProjectFile()
 {
-	if (CPPack::hasProjectFilePath)
-		throw InvalidProjectHandlingException("A project configuration file was found");
+	throwIfHasProjectFile(fs::current_path());
 }

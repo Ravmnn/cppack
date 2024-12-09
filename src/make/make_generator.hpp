@@ -5,6 +5,10 @@
 
 
 
+class ProjectData;
+
+
+
 class MakefileGenerator
 {
 private:
@@ -35,3 +39,7 @@ public:
 	void patternRule(const std::string& name, const std::string& dep1, const std::string& dep2) noexcept;
 	void ruleCommand(const std::string& command, bool silent = true) noexcept;
 };
+
+
+
+void generateMakefileFromProjectData(const std::string& fileToSave, const ProjectData& data);

@@ -1,6 +1,6 @@
-#include "project_data/project_data.hpp"
 #include <cppack/cppack.hpp>
 
+#include <filesystem>
 #include <utility/file.hpp>
 #include <project_data/project_data_exceptions.hpp>
 #include <make/make_generator.hpp>
@@ -9,20 +9,134 @@
 
 
 
+const fs::path CPPack::cppackDirectoryPath = getHomeDirectoryPath().append(".cppack");
+const fs::path CPPack::cppackIndexDirectoryPath = CPPack::cppackDirectoryPath / "index";
+
 const std::string CPPack::projectFileExtension = ".cpproj";
 const std::string CPPack::buildMakefileName = "Makefile";
 
 
-std::string CPPack::projectFilePath = "";
-bool CPPack::hasProjectFilePath = false;
 
 
 
-
-
-void CPPack::init(const std::string& path) noexcept
+CPPack::CPPack(const std::string& path)
 {
-	hasProjectFilePath = directoryHierarchyContainsProjectFile(path, &projectFilePath);
+	if (!fs::exists(path))
+		throw InvalidProjectHandlingException("Invalid path: " + path);
+
+	_hasProjectFilePath = directoryHierarchyContainsProjectFile(path, &_projectFilePath);
+
+	if (_hasProjectFilePath)
+		_data = ProjectDataManager(_projectFilePath).getData();
+}
+
+
+
+
+
+std::string CPPack::getBuildMakefilePath() const noexcept
+{
+	return fs::path(_data.buildDirectory).append(buildMakefileName);
+}
+
+
+
+
+
+void CPPack::buildProject() const
+{
+	createDirectoryIfNotExists(_data.buildDirectory);
+
+	generateMakefileFromProjectData(getBuildMakefilePath(), _data);
+	runProjectMakefile("build");
+}
+
+
+void CPPack::runProject() const
+{
+	if (_data.type != ProjectType::Executable)
+		throw InvalidProjectHandlingException("Project type is not runnable");
+
+	buildProject();
+	runProjectMakefile("run");
+}
+
+
+void CPPack::cleanProject() const
+{
+	fs::remove_all(_data.buildDirectory);
+}
+
+
+void CPPack::runProjectMakefile(const std::string& makeRule) const
+{
+	const std::string path = getBuildMakefilePath();
+	const std::string command = "make " + makeRule + " -s -f " + path;
+
+	if (!fs::exists(path))
+		throw InvalidProjectHandlingException("Could not find Makefile: " + path);
+
+	system(command.c_str());
+}
+
+
+
+
+
+void CPPack::init() noexcept
+{
+	setupCppackGlobalEnvironment();
+}
+
+
+
+
+
+static void copyPackageToIndex(const CPPack& cppack)
+{
+	const fs::path packagePath = fs::absolute(cppack.getProjectFilePath()).parent_path();
+	const fs::path targetPath = CPPack::cppackIndexDirectoryPath / cppack.getData().name;
+
+	if (!fs::exists(packagePath))
+		throw InvalidPackageIndexHandling("Invalid package path");
+
+	fs::create_directory(targetPath);
+
+	fs::copy(packagePath, targetPath, fs::copy_options::recursive | fs::copy_options::overwrite_existing);
+}
+
+
+
+void CPPack::registerPackage(const CPPack& package)
+{
+	const ProjectData& packageData = package.getData();
+
+	if (isPackageRegistered(packageData.name))
+		throw InvalidPackageIndexHandling("Package is already registered");
+
+	if (packageData.type == ProjectType::Executable)
+		throw InvalidPackageIndexHandling("Cannot register a executable type package");
+
+	copyPackageToIndex(package);
+}
+
+
+void CPPack::unregisterPackage(const std::string& name)
+{
+	if (!isPackageRegistered(name))
+		throw InvalidPackageIndexHandling("Package is not registered");
+
+	fs::remove_all(cppackIndexDirectoryPath / name);
+}
+
+
+bool CPPack::isPackageRegistered(const std::string& name) noexcept
+{
+	for (const auto& dir : fs::directory_iterator(cppackIndexDirectoryPath))
+		if (dir.path().stem().string() == name)
+			return true;
+
+	return false;
 }
 
 
@@ -31,7 +145,7 @@ void CPPack::init(const std::string& path) noexcept
 
 bool CPPack::directoryContainsProjectFile(const std::string& path, std::string* const projectFilePath) noexcept
 {
-	for (const auto& file : std::filesystem::directory_iterator(path))
+	for (const auto& file : fs::directory_iterator(path))
 	{
 		if (file.path().extension() != projectFileExtension)
 			continue;
@@ -48,7 +162,7 @@ bool CPPack::directoryContainsProjectFile(const std::string& path, std::string* 
 
 bool CPPack::directoryHierarchyContainsProjectFile(const std::string& path, std::string* const projectFilePath) noexcept
 {
-	const std::filesystem::path ppath = path;
+	const fs::path ppath = path;
 
 	if (directoryContainsProjectFile(ppath, projectFilePath))
 		return true;
@@ -64,7 +178,7 @@ ProjectData CPPack::generateDefaultProjectData(const std::string& name, const Pr
 {
 	ProjectData data;
 
-	data.name = (name.empty() ? std::filesystem::current_path().stem().string() : name);
+	data.name = (name.empty() ? fs::current_path().stem().string() : name);
 	data.type = type;
 	data.sourceDirectory = "src";
 	data.headerDirectory = (type == ProjectType::Executable ? data.sourceDirectory : "include");
@@ -94,131 +208,6 @@ BuildSetting CPPack::generateDefaultBuildSetting(const std::string& name, const 
 
 
 
-ProjectData CPPack::getProjectDataFromCurrentProject()
-{
-	InvalidProjectHandlingException::throwIfHasNotProjectFile();
-
-	return ProjectDataManager(CPPack::projectFilePath).get_data();
-}
-
-
-
-
-
-const std::string CPPack::makefileRunRuleName = "run";
-const std::string CPPack::makefileBuildRuleName = "build";
-
-
-
-
-
-static std::string getMakefileCommandForLinkingProjectOfType(const ProjectType type) noexcept
-{
-	switch (type)
-	{
-		case ProjectType::Executable: return (std::string)"$(CPP_COMPILER) $(OBJECTS) -o $(BIN_PATH) $(CPP_OPTIONS)";
-		case ProjectType::StaticLibrary: return (std::string)"ar rcs $(BIN_PATH) $(OBJECTS)";
-		case ProjectType::SharedLibrary: return (std::string)"$(CPP_COMPILER) $(OBJECTS) -o $(BIN_PATH) -shared -fPIC $(CPP_OPTIONS)";
-
-		default: return "invalid";
-	}
-}
-
-
-static std::string getMakefileOutFileExtensionForProjectOfType(const ProjectType type) noexcept
-{
-	switch (type)
-	{
-		case ProjectType::Executable: return "";
-		case ProjectType::StaticLibrary: return ".a";
-		case ProjectType::SharedLibrary: return ".so";
-
-		default: return "";
-	}
-}
-
-
-void CPPack::generateMakefileFromProjectData(const std::string& fileToSave, const ProjectData& data)
-{
-	const BuildSetting* buildSetting = data.buildSetting();
-
-	if (!buildSetting)
-		throw InvalidProjectDataException("There are no build settings");
-
-
-	std::vector<std::string> include_paths = data.additionalIncludePaths;
-	include_paths.insert(include_paths.begin(), data.headerDirectory);
-
-
-	MakefileGenerator make;
-
-	make.comment("This was auto-generated");
-	make.newline();
-
-	make.variableAdd("MAKEFLAGS", "-j4");
-	make.newline();
-
-	make.variable("NAME", data.name + getMakefileOutFileExtensionForProjectOfType(data.type));
-	make.newline();
-
-	make.variable("CURRENT_BUILD_SETTING", data.currentBuildSetting);
-	make.newline();
-
-	make.variable("SOURCE_PATH", data.sourceDirectory);
-	make.variable("BUILD_PATH", data.buildDirectory);
-	make.newline();
-
-	make.variable("COMPLETE_BUILD_PATH", "$(BUILD_PATH)/$(CURRENT_BUILD_SETTING)");
-	make.variable("OBJECT_PATH", "$(COMPLETE_BUILD_PATH)/obj");
-	make.newline();
-
-	make.variable("BIN_PATH", "$(COMPLETE_BUILD_PATH)/$(NAME)");
-	make.newline();
-
-	make.variable("SOURCES", "$(shell find $(SOURCE_PATH) -name \"*.cpp\")");
-	make.variable("OBJECTS", "$(addprefix $(OBJECT_PATH)/, $(patsubst $(SOURCE_PATH)/%, %, $(SOURCES:.cpp=.o)))");
-	make.newline();
-
-	make.variable("CPP_COMPILER", data.languageCompiler);
-	make.variableWithPrefix("CPP_VERSION", "-std=c++", std::to_string(data.languageVersion));
-	make.newline();
-
-	make.listVariableWithPrefix("CPP_INCLUDE_PATHS", "-I", include_paths);
-	make.variable("CPP_OPTIMIZATION", buildOptimizationTypeToCompilerOption(buildSetting->optimizationType));
-	make.variable("CPP_WARNING", buildWarningTypeToCompilerOption(buildSetting->warningType));
-	make.listVariableWithPrefix("CPP_DEFINES", "-D", buildSetting->defines);
-	make.variable("CPP_ADDITIONAL_OPTIONS", buildSetting->additionalOptions);
-	make.newline();
-
-	make.variable("CPP_OPTIONS", "$(CPP_VERSION) $(CPP_INCLUDE_PATHS) $(CPP_OPTIMIZATION) $(CPP_WARNING) $(CPP_DEFINES) $(CPP_ADDITIONAL_OPTIONS)");
-	make.newline(2);
-
-	make.rule(makefileBuildRuleName, "$(BIN_PATH)", true);
-	make.newline(2);
-
-	make.rule(makefileRunRuleName, "", true);
-		make.ruleCommand("$(BIN_PATH)");
-	make.newline(2);
-
-	make.rule("$(BIN_PATH)", "$(OBJECTS)");
-		make.ruleCommand(getMakefileCommandForLinkingProjectOfType(data.type));
-	make.newline(2);
-
-	make.patternRule("$(OBJECTS)", "$(OBJECT_PATH)/%.o", "$(SOURCE_PATH)/%.cpp");
-		make.ruleCommand("mkdir $(dir $@) -p");
-		make.ruleCommand("$(CPP_COMPILER) -c $< -o $@ $(CPP_OPTIONS)");
-
-
-	writeFile(fileToSave, make.get());
-}
-
-
-
-std::string CPPack::getBuildMakefilePath(const ProjectData& data) noexcept
-{
-	return std::filesystem::path(data.buildDirectory).append(buildMakefileName);
-}
-
 
 
 void CPPack::setupProjectEnvironment(const ProjectData& data) noexcept
@@ -230,38 +219,8 @@ void CPPack::setupProjectEnvironment(const ProjectData& data) noexcept
 }
 
 
-void CPPack::buildProject(const ProjectData& data)
+void CPPack::setupCppackGlobalEnvironment() noexcept
 {
-	createDirectoryIfNotExists(data.buildDirectory);
-
-	generateMakefileFromProjectData(getBuildMakefilePath(data), data);
-	runProjectMakefile(data, makefileBuildRuleName);
-}
-
-
-void CPPack::runProject(const ProjectData& data)
-{
-	if (data.type != ProjectType::Executable)
-		throw InvalidProjectHandlingException("Project type is not runnable");
-
-	buildProject(data);
-	runProjectMakefile(data, makefileRunRuleName);
-}
-
-
-void CPPack::cleanProject(const ProjectData& data)
-{
-	std::filesystem::remove_all(data.buildDirectory);
-}
-
-
-void CPPack::runProjectMakefile(const ProjectData& data, const std::string& makeRule)
-{
-	const std::string path = getBuildMakefilePath(data);
-	const std::string command = "make " + makeRule + " -s -f " + path;
-
-	if (!std::filesystem::exists(path))
-		throw InvalidProjectHandlingException("Could not find Makefile: " + path);
-
-	system(command.c_str());
+	createDirectoryIfNotExists(cppackDirectoryPath);
+	createDirectoryIfNotExists(cppackIndexDirectoryPath);
 }

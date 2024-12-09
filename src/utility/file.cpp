@@ -1,15 +1,13 @@
 #include <utility/file.hpp>
 
-#include <sstream>
 #include <fstream>
-#include <filesystem>
 
 
 
 void createDirectoryIfNotExists(const std::string& name) noexcept
 {
-	if (!std::filesystem::exists(name))
-		std::filesystem::create_directory(name);
+	if (!fs::exists(name))
+		fs::create_directory(name);
 }
 
 
@@ -30,4 +28,12 @@ void writeFile(const std::string& path, const std::string& content)
 	std::ofstream file(path);
 
 	file << content;
+}
+
+
+
+
+fs::path getHomeDirectoryPath() noexcept
+{
+	return getenv("HOME");
 }

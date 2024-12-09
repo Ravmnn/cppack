@@ -2,6 +2,8 @@
 
 #include <CLI11.hpp>
 
+#include <cppack/cppack.hpp>
+
 
 
 class Command
@@ -16,9 +18,12 @@ protected:
 
 
 public:
+	CPPack* const cppack;
+
+
 	Command() = delete;
 
-	Command(CLI::App* app, const std::string& name, const std::string& description);
+	Command(CPPack* cppack, CLI::App* app, const std::string& name, const std::string& description);
 
 
 	CLI::App* get_app() const noexcept { return app; }

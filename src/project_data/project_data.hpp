@@ -156,9 +156,9 @@ public:
 	explicit ProjectDataManager(const std::string& path);
 
 
-	const ProjectData& get_data() const noexcept { return _data; }
+	const ProjectData& getData() const noexcept { return _data; }
 
-	void set_data(const ProjectData& data) noexcept { _data = data; }
+	void setData(const ProjectData& data) noexcept { _data = data; }
 
 
 	void print() const noexcept;

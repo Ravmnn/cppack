@@ -1,25 +1,50 @@
 #pragma once
 
+#include <utility/file.hpp>
 #include <project_data/project_data.hpp>
 
 
 
 class CPPack
 {
-public:
-	CPPack() = delete;
-	~CPPack() = delete;
+private:
+	std::string _projectFilePath;
+	bool _hasProjectFilePath;
 
+	ProjectData _data;
+
+
+public:
+	static const fs::path cppackDirectoryPath;
+	static const fs::path cppackIndexDirectoryPath;
 
 	static const std::string projectFileExtension;
 	static const std::string buildMakefileName;
 
 
-	static std::string projectFilePath;
-	static bool hasProjectFilePath;
+	explicit CPPack(const std::string& path);
 
 
-	static void init(const std::string& path) noexcept;
+	const std::string& getProjectFilePath() const noexcept { return _projectFilePath; }
+	bool hasProjectFilePath() const noexcept { return _hasProjectFilePath; }
+	const ProjectData& getData() const noexcept { return _data; }
+
+
+	std::string getBuildMakefilePath() const noexcept;
+
+
+	void buildProject() const;
+	void runProject() const;
+	void cleanProject() const;
+	void runProjectMakefile(const std::string& makeRule) const;
+
+
+	static void init() noexcept;
+
+
+	static void registerPackage(const CPPack& package);
+	static void unregisterPackage(const std::string& name);
+	static bool isPackageRegistered(const std::string& name) noexcept;
 
 
 	static bool directoryContainsProjectFile(const std::string& path, std::string* projectFilePath = nullptr) noexcept;
@@ -29,20 +54,7 @@ public:
 	static ProjectData generateDefaultProjectData(const std::string& name, ProjectType type) noexcept;
 	static BuildSetting generateDefaultBuildSetting(const std::string& name, BuildOptimizationType optimization, BuildWarningType warning) noexcept;
 
-	static ProjectData getProjectDataFromCurrentProject();
-
-
-	static const std::string makefileRunRuleName;
-	static const std::string makefileBuildRuleName;
-
-
-	static void generateMakefileFromProjectData(const std::string& fileToSave, const ProjectData& data);
-
-	static std::string getBuildMakefilePath(const ProjectData& data) noexcept;
 
 	static void setupProjectEnvironment(const ProjectData& data) noexcept;
-	static void buildProject(const ProjectData& data);
-	static void runProject(const ProjectData& data);
-	static void cleanProject(const ProjectData& data);
-	static void runProjectMakefile(const ProjectData& data, const std::string& makeRule = "");
+	static void setupCppackGlobalEnvironment() noexcept;
 };
