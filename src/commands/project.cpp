@@ -18,8 +18,6 @@ void CommandProjectInit::run()
 
 	const ProjectData data = CPPack::generateDefaultProjectData(_projectName, projectTypeFromString(_projectType));
 	CPPack::setupProjectEnvironment(data);
-
-	std::cout << "Project created: " << data.name << std::endl;
 }
 
 
@@ -82,8 +80,6 @@ CommandProjectClean::CommandProjectClean(CPPack* const cppack, CLI::App* const a
 void CommandProjectClean::run()
 {
 	InvalidProjectHandlingException::throwIfHasNotProjectFile();
-
-	std::cout << "Removing build directory" << std::endl;
 
 	cppack->cleanProject();
 }

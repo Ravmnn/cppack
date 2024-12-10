@@ -276,8 +276,6 @@ fs::path CPPack::getAbsoluteSourcePath() const noexcept
 
 
 
-
-
 void CPPack::init() noexcept
 {
 	setupCppackGlobalEnvironment();
