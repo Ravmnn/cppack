@@ -1,3 +1,4 @@
+#include <cctype>
 #include <cppack/cppack.hpp>
 
 #include <utility/file.hpp>
@@ -33,7 +34,44 @@ CPPack::CPPack(const std::string& path)
 
 std::string CPPack::getBuildMakefilePath() const noexcept
 {
-	return fs::path(getData().buildDirectory).append(buildMakefileName);
+	return toAbsolutePath((fs::path)getData().buildDirectory / buildMakefileName);
+}
+
+
+
+
+
+std::string CPPack::getProjectOutFileExtension() const noexcept
+{
+	switch (getData().type)
+	{
+		case ProjectType::SharedLibrary: return ".so";
+		case ProjectType::StaticLibrary: return ".a";
+
+		default: return "";
+	}
+}
+
+
+std::string CPPack::getProjectOutFileStem() const noexcept
+{
+	const ProjectData data = getData();
+
+	switch (data.type)
+	{
+		case ProjectType::SharedLibrary:
+		case ProjectType::StaticLibrary:
+			return "lib" + data.name;
+
+		default:
+			return data.name;
+	}
+}
+
+
+std::string CPPack::getProjectFullOutFileName() const noexcept
+{
+	return getProjectOutFileStem() + getProjectOutFileExtension();
 }
 
 
@@ -44,10 +82,19 @@ void CPPack::buildProject() const
 {
 	const ProjectData projectData = getData();
 
-	createDirectoryIfNotExists(projectData.buildDirectory);
+	createDirectoryIfNotExists(toAbsolutePath(projectData.buildDirectory));
+	generateMakefileFromProject(getBuildMakefilePath(), *this);
 
-	generateMakefileFromProjectData(getBuildMakefilePath(), projectData);
+	buildProjectDependencies();
+
 	runProjectMakefile("build");
+}
+
+
+void CPPack::buildProjectDependencies() const
+{
+	for (const std::string& dependency : getData().dependencies)
+		getPackage(dependency).buildProject();
 }
 
 
@@ -115,6 +162,130 @@ bool CPPack::isPackageADependency(const std::string& name) const noexcept
 
 
 
+std::vector<std::string> CPPack::getIncludePaths(bool includeProject) const noexcept
+{
+	const ProjectData data = getData();
+
+	std::vector<std::string> includePaths;
+	std::vector<std::string> additionalPaths;
+
+	for (const std::string& path : data.additionalIncludePaths)
+		additionalPaths.push_back(toAbsolutePath(path));
+
+	if (includeProject)
+		includePaths.push_back(getFullHeaderPath());
+
+	insertAtEnd(includePaths, additionalPaths);
+
+	return includePaths;
+}
+
+
+std::vector<std::string> CPPack::getLibraryPaths(bool includeProject) const noexcept
+{
+	const ProjectData data = getData();
+
+	std::vector<std::string> libraryPaths;
+	// std::vector<std::string> additionalPaths;
+
+	// for (const std::string& path : data.additionalIncludePaths)
+	// 	additionalPaths.push_back(toAbsolutePath(path));
+
+	if (includeProject)
+		libraryPaths.push_back(getFullSourcePath());
+
+	// insertAtEnd(libraryPaths, additionalPaths);
+
+	return libraryPaths;
+}
+
+
+std::vector<std::string> CPPack::getDependenciesIncludePaths() const noexcept
+{
+	const ProjectData data = getData();
+
+	std::vector<std::string> includePaths;
+
+	for (const std::string& dependency : data.dependencies)
+	{
+		const CPPack package = getPackage(dependency);
+
+		insertAtEnd(includePaths, package.getIncludePaths());
+		insertAtEnd(includePaths, package.getDependenciesIncludePaths());
+	}
+
+	return includePaths;
+}
+
+
+std::vector<std::string> CPPack::getDependenciesLibraryPaths() const noexcept
+{
+	const ProjectData data = getData();
+
+	std::vector<std::string> libraryPaths;
+
+	for (const std::string& dependency : data.dependencies)
+	{
+		CPPack package = getPackage(dependency);
+
+		libraryPaths.push_back(package.getFullBuildPath());
+		insertAtEnd(libraryPaths, package.getDependenciesLibraryPaths());
+	}
+
+	return libraryPaths;
+}
+
+
+std::vector<std::string> CPPack::getAllIncludePaths() const noexcept
+{
+	std::vector<std::string> includePaths;
+
+	insertAtEnd(includePaths, getIncludePaths());
+	insertAtEnd(includePaths, getDependenciesIncludePaths());
+
+	return includePaths;
+}
+
+
+std::vector<std::string> CPPack::getAllLibraryPaths() const noexcept
+{
+	std::vector<std::string> libraryPaths;
+
+	// no need to include the project out library
+	insertAtEnd(libraryPaths, getLibraryPaths(false));
+	insertAtEnd(libraryPaths, getDependenciesLibraryPaths());
+
+	return libraryPaths;
+}
+
+
+
+
+
+std::string CPPack::getFullBuildPath() const noexcept
+{
+	const ProjectData data = getData();
+	return toAbsolutePath(data.buildDirectory) / data.currentBuildSetting;
+}
+
+
+std::string CPPack::getFullHeaderPath() const noexcept
+{
+	return toAbsolutePath(getData().headerDirectory);
+}
+
+
+std::string CPPack::getFullSourcePath() const noexcept
+{
+	return toAbsolutePath(getData().sourceDirectory);
+}
+
+
+
+
+
+
+
 void CPPack::init() noexcept
 {
 	setupCppackGlobalEnvironment();
@@ -170,7 +341,7 @@ bool CPPack::isPackageRegistered(const std::string& name) noexcept
 
 
 
-bool CPPack::directoryContainsProjectFile(const std::string& path, std::string* const projectFilePath) noexcept
+bool CPPack::directoryContainsProjectFile(const std::string& path, fs::path* const projectFilePath) noexcept
 {
 	for (const auto& file : fs::directory_iterator(path))
 	{
@@ -187,7 +358,7 @@ bool CPPack::directoryContainsProjectFile(const std::string& path, std::string* 
 }
 
 
-bool CPPack::directoryHierarchyContainsProjectFile(const std::string& path, std::string* const projectFilePath) noexcept
+bool CPPack::directoryHierarchyContainsProjectFile(const std::string& path, fs::path* const projectFilePath) noexcept
 {
 	const fs::path ppath = path;
 

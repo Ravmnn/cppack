@@ -1,3 +1,4 @@
+#include "cppack/cppack.hpp"
 #include <make/make_generator.hpp>
 
 #include <utility/file.hpp>
@@ -106,29 +107,13 @@ static std::string getMakefileCommandForLinkingProjectOfType(const ProjectType t
 }
 
 
-static std::string getMakefileOutFileExtensionForProjectOfType(const ProjectType type) noexcept
+void generateMakefileFromProject(const std::string& fileToSave, const CPPack& project)
 {
-	switch (type)
-	{
-		case ProjectType::Executable: return "";
-		case ProjectType::StaticLibrary: return ".a";
-		case ProjectType::SharedLibrary: return ".so";
-
-		default: return "";
-	}
-}
-
-
-void generateMakefileFromProjectData(const std::string& fileToSave, const ProjectData& data)
-{
+	const ProjectData data = project.getData();
 	const BuildSetting* buildSetting = data.buildSetting();
 
 	if (!buildSetting)
 		throw InvalidProjectDataException("There are no build settings");
-
-
-	std::vector<std::string> include_paths = data.additionalIncludePaths;
-	include_paths.insert(include_paths.begin(), data.headerDirectory);
 
 
 	MakefileGenerator make;
@@ -139,7 +124,7 @@ void generateMakefileFromProjectData(const std::string& fileToSave, const Projec
 	make.variableAdd("MAKEFLAGS", "-j4");
 	make.newline();
 
-	make.variable("NAME", data.name + getMakefileOutFileExtensionForProjectOfType(data.type));
+	make.variable("NAME", project.getProjectFullOutFileName());
 	make.newline();
 
 	make.variable("CURRENT_BUILD_SETTING", data.currentBuildSetting);
@@ -164,14 +149,16 @@ void generateMakefileFromProjectData(const std::string& fileToSave, const Projec
 	make.variableWithPrefix("CPP_VERSION", "-std=c++", std::to_string(data.languageVersion));
 	make.newline();
 
-	make.listVariableWithPrefix("CPP_INCLUDE_PATHS", "-I", include_paths);
+	make.listVariableWithPrefix("CPP_INCLUDE_PATHS", "-I", project.getAllIncludePaths());
+	make.listVariableWithPrefix("CPP_LIBRARIES_PATHS", "-L", project.getAllLibraryPaths());
+	make.listVariableWithPrefix("CPP_LIBRARIES", "-l", data.dependencies);
 	make.variable("CPP_OPTIMIZATION", buildOptimizationTypeToCompilerOption(buildSetting->optimizationType));
 	make.variable("CPP_WARNING", buildWarningTypeToCompilerOption(buildSetting->warningType));
 	make.listVariableWithPrefix("CPP_DEFINES", "-D", buildSetting->defines);
 	make.variable("CPP_ADDITIONAL_OPTIONS", buildSetting->additionalOptions);
 	make.newline();
 
-	make.variable("CPP_OPTIONS", "$(CPP_VERSION) $(CPP_INCLUDE_PATHS) $(CPP_OPTIMIZATION) $(CPP_WARNING) $(CPP_DEFINES) $(CPP_ADDITIONAL_OPTIONS)");
+	make.variable("CPP_OPTIONS", "$(CPP_VERSION) $(CPP_INCLUDE_PATHS) $(CPP_LIBRARIES_PATHS) $(CPP_LIBRARIES) $(CPP_OPTIMIZATION) $(CPP_WARNING) $(CPP_DEFINES) $(CPP_ADDITIONAL_OPTIONS)");
 	make.newline(2);
 
 	make.rule("build", "$(BIN_PATH)", true);

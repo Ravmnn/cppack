@@ -6,6 +6,7 @@
 
 
 class ProjectData;
+class CPPack;
 
 
 
@@ -42,4 +43,4 @@ public:
 
 
 
-void generateMakefileFromProjectData(const std::string& fileToSave, const ProjectData& data);
+void generateMakefileFromProject(const std::string& fileToSave, const CPPack& project);
