@@ -1,11 +1,8 @@
 #include <cppack/cppack.hpp>
 
-#include <utility/file.hpp>
 #include <utility/vector.hpp>
-#include <project_data/project_data_exceptions.hpp>
-#include <make/make_generator.hpp>
-#include <make/compiler_options.hpp>
 #include <cppack/cppack_exceptions.hpp>
+#include <make/make_generator.hpp>
 
 
 
@@ -31,15 +28,6 @@ CPPack::CPPack(const std::string& path)
 
 
 
-std::string CPPack::getBuildMakefilePath() const noexcept
-{
-	return toAbsolutePath((fs::path)getData().buildDirectory / buildMakefileName);
-}
-
-
-
-
-
 std::string CPPack::getProjectOutFileExtension() const noexcept
 {
 	switch (getData().type)
@@ -54,16 +42,16 @@ std::string CPPack::getProjectOutFileExtension() const noexcept
 
 std::string CPPack::getProjectOutFileStem() const noexcept
 {
-	const ProjectData data = getData();
+	const ProjectData projectData = getData();
 
-	switch (data.type)
+	switch (projectData.type)
 	{
 		case ProjectType::SharedLibrary:
 		case ProjectType::StaticLibrary:
-			return "lib" + data.name;
+			return "lib" + projectData.name;
 
 		default:
-			return data.name;
+			return projectData.name;
 	}
 }
 
@@ -79,10 +67,8 @@ std::string CPPack::getProjectFullOutFileName() const noexcept
 
 void CPPack::buildProject() const
 {
-	const ProjectData projectData = getData();
-
-	createDirectoryIfNotExists(toAbsolutePath(projectData.buildDirectory));
-	generateMakefileFromProject(getBuildMakefilePath(), *this);
+	createDirectoryIfNotExists(getAbsoluteBuildPath());
+	generateMakefileFromProject(getAbsoluteMakefilePath(), *this);
 
 	buildProjectDependencies();
 
@@ -115,7 +101,7 @@ void CPPack::cleanProject() const
 
 void CPPack::runProjectMakefile(const std::string& makeRule) const
 {
-	const std::string path = getBuildMakefilePath();
+	const std::string path = getAbsoluteMakefilePath();
 	const std::string command = "make " + makeRule + " -s -f " + path;
 
 	if (!fs::exists(path))
@@ -136,7 +122,7 @@ void CPPack::addPackageDependency(const std::string& name) const
 	ProjectData projectData = getData();
 	projectData.dependencies.push_back(name);
 
-	ProjectDataManager::writeToFile(projectData, getProjectFilePath());
+	ProjectDataManager::writeToFile(projectData, getAbsoluteProjectFilePath());
 }
 
 
@@ -144,17 +130,17 @@ void CPPack::removePackageDependency(const std::string& name) const
 {
 	InvalidPackageIndexHandling::throwIfIsNotDependency(*this, name);
 
-	ProjectData data = getData();
-	data.dependencies.erase(find(data.dependencies, name));
+	ProjectData projectData = getData();
+	projectData.dependencies.erase(find(projectData.dependencies, name));
 
-	ProjectDataManager::writeToFile(data, getProjectFilePath());
+	ProjectDataManager::writeToFile(projectData, getAbsoluteProjectFilePath());
 }
 
 
 bool CPPack::isPackageADependency(const std::string& name) const noexcept
 {
-	const ProjectData data = getData();
-	return find(data.dependencies, name) != data.dependencies.cend();
+	const ProjectData projectData = getData();
+	return find(projectData.dependencies, name) != projectData.dependencies.cend();
 }
 
 
@@ -163,16 +149,14 @@ bool CPPack::isPackageADependency(const std::string& name) const noexcept
 
 std::vector<std::string> CPPack::getIncludePaths(bool includeProject) const noexcept
 {
-	const ProjectData data = getData();
-
 	std::vector<std::string> includePaths;
 	std::vector<std::string> additionalPaths;
 
-	for (const std::string& path : data.additionalIncludePaths)
-		additionalPaths.push_back(toAbsolutePath(path));
+	for (const std::string& path : getData().additionalIncludePaths)
+		additionalPaths.push_back(toAbsoluteProjectPath(path));
 
 	if (includeProject)
-		includePaths.push_back(getFullHeaderPath());
+		includePaths.push_back(getAbsoluteHeaderPath());
 
 	insertAtEnd(includePaths, additionalPaths);
 
@@ -182,16 +166,16 @@ std::vector<std::string> CPPack::getIncludePaths(bool includeProject) const noex
 
 std::vector<std::string> CPPack::getLibraryPaths(bool includeProject) const noexcept
 {
-	const ProjectData data = getData();
+	// const ProjectData projectData = getData();
 
 	std::vector<std::string> libraryPaths;
 	// std::vector<std::string> additionalPaths;
 
-	// for (const std::string& path : data.additionalIncludePaths)
+	// for (const std::string& path : projectData.additionalIncludePaths)
 	// 	additionalPaths.push_back(toAbsolutePath(path));
 
 	if (includeProject)
-		libraryPaths.push_back(getFullSourcePath());
+		libraryPaths.push_back(getAbsoluteSourcePath());
 
 	// insertAtEnd(libraryPaths, additionalPaths);
 
@@ -201,11 +185,9 @@ std::vector<std::string> CPPack::getLibraryPaths(bool includeProject) const noex
 
 std::vector<std::string> CPPack::getDependenciesIncludePaths() const noexcept
 {
-	const ProjectData data = getData();
-
 	std::vector<std::string> includePaths;
 
-	for (const std::string& dependency : data.dependencies)
+	for (const std::string& dependency : getData().dependencies)
 	{
 		const CPPack package = getPackage(dependency);
 
@@ -219,15 +201,13 @@ std::vector<std::string> CPPack::getDependenciesIncludePaths() const noexcept
 
 std::vector<std::string> CPPack::getDependenciesLibraryPaths() const noexcept
 {
-	const ProjectData data = getData();
-
 	std::vector<std::string> libraryPaths;
 
-	for (const std::string& dependency : data.dependencies)
+	for (const std::string& dependency : getData().dependencies)
 	{
 		CPPack package = getPackage(dependency);
 
-		libraryPaths.push_back(package.getFullFinalBuildPath());
+		libraryPaths.push_back(package.getAbsoluteFinalBuildPath());
 		insertAtEnd(libraryPaths, package.getDependenciesLibraryPaths());
 	}
 
@@ -261,28 +241,35 @@ std::vector<std::string> CPPack::getAllLibraryPaths() const noexcept
 
 
 
-std::string CPPack::getFullBuildPath() const noexcept
+fs::path CPPack::getAbsoluteMakefilePath() const noexcept
 {
-	return toAbsolutePath(getData().buildDirectory);
+	return getAbsoluteBuildPath() / buildMakefileName;
 }
 
 
-std::string CPPack::getFullFinalBuildPath() const noexcept
+
+fs::path CPPack::getAbsoluteBuildPath() const noexcept
+{
+	return toAbsoluteProjectPath(getData().buildDirectory);
+}
+
+
+fs::path CPPack::getAbsoluteFinalBuildPath() const noexcept
 {
 	const ProjectData data = getData();
-	return toAbsolutePath(data.buildDirectory) / data.currentBuildSetting;
+	return toAbsoluteProjectPath(data.buildDirectory) / data.currentBuildSetting;
 }
 
 
-std::string CPPack::getFullHeaderPath() const noexcept
+fs::path CPPack::getAbsoluteHeaderPath() const noexcept
 {
-	return toAbsolutePath(getData().headerDirectory);
+	return toAbsoluteProjectPath(getData().headerDirectory);
 }
 
 
-std::string CPPack::getFullSourcePath() const noexcept
+fs::path CPPack::getAbsoluteSourcePath() const noexcept
 {
-	return toAbsolutePath(getData().sourceDirectory);
+	return toAbsoluteProjectPath(getData().sourceDirectory);
 }
 
 
@@ -302,7 +289,7 @@ void CPPack::init() noexcept
 
 static void copyPackageToGlobalPackageIndex(const CPPack& package)
 {
-	const fs::path packagePath = fs::absolute(package.getProjectFilePath()).parent_path();
+	const fs::path packagePath = fs::absolute(package.getAbsoluteProjectPath());
 	const fs::path targetPath = CPPack::cppackIndexDirectoryPath / package.getData().name;
 
 	fs::create_directory(targetPath);
@@ -314,7 +301,7 @@ static void copyPackageToGlobalPackageIndex(const CPPack& package)
 
 void CPPack::registerPackage(const CPPack& package)
 {
-	const ProjectData& packageData = package.getData();
+	const ProjectData packageData = package.getData();
 
 	InvalidPackageIndexHandling::throwIfRegistered(packageData.name);
 

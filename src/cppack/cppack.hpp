@@ -23,17 +23,11 @@ public:
 	explicit CPPack(const std::string& path);
 
 
-	const fs::path& getProjectFilePath() const noexcept { return _projectFilePath; }
-	fs::path getProjectPath() const noexcept { return _projectFilePath.parent_path(); }
+	fs::path getAbsoluteProjectFilePath() const noexcept { return fs::absolute(_projectFilePath); }
+	fs::path getAbsoluteProjectPath() const noexcept { return fs::absolute(_projectFilePath.parent_path()); }
 	bool hasProjectFilePath() const noexcept { return _hasProjectFilePath; }
 
-	ProjectData getData() const { return ProjectDataManager::readFromFile(_projectFilePath).getData(); }
-
-
-	std::string getBuildMakefilePath() const noexcept;
-
-
-	fs::path toAbsolutePath(const fs::path& other) const noexcept { return getProjectPath() / other; }
+	ProjectData getData() const { return ProjectDataManager::readFromFile(getAbsoluteProjectFilePath()).getData(); }
 
 
 	std::string getProjectOutFileExtension() const noexcept;
@@ -60,10 +54,15 @@ public:
 	std::vector<std::string> getAllIncludePaths() const noexcept;
 	std::vector<std::string> getAllLibraryPaths() const noexcept;
 
-	std::string getFullBuildPath() const noexcept;
-	std::string getFullFinalBuildPath() const noexcept;
-	std::string getFullHeaderPath() const noexcept;
-	std::string getFullSourcePath() const noexcept;
+
+	fs::path toAbsoluteProjectPath(const fs::path& other) const noexcept { return getAbsoluteProjectPath() / other; }
+
+	fs::path getAbsoluteMakefilePath() const noexcept;
+
+	fs::path getAbsoluteBuildPath() const noexcept;
+	fs::path getAbsoluteFinalBuildPath() const noexcept;
+	fs::path getAbsoluteHeaderPath() const noexcept;
+	fs::path getAbsoluteSourcePath() const noexcept;
 
 
 	static void init() noexcept;

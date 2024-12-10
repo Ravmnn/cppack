@@ -1,4 +1,3 @@
-#include "json/json.hpp"
 #include <project_data/project_data.hpp>
 
 #include <iostream>

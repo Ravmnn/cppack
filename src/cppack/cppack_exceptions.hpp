@@ -1,8 +1,10 @@
 #pragma once
 
-#include "cppack/cppack.hpp"
 #include <cppack/exception.hpp>
 
+
+
+class CPPack;
 
 
 class InvalidProjectHandlingException : public CPPackException

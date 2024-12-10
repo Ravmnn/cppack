@@ -1,7 +1,5 @@
 #include <commands/index.hpp>
 
-#include <cppack/cppack.hpp>
-
 
 
 CommandIndexRegister::CommandIndexRegister(CPPack* const cppack, CLI::App* const app)

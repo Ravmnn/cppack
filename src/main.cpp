@@ -1,4 +1,3 @@
-#include <cppack/cppack.hpp>
 #include <cppack/exception.hpp>
 #include <commands/project.hpp>
 #include <commands/index.hpp>

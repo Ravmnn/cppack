@@ -1,6 +1,5 @@
 #include <commands/project.hpp>
 
-#include <cppack/cppack.hpp>
 #include <cppack/cppack_exceptions.hpp>
 
 

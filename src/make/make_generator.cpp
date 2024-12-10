@@ -1,8 +1,6 @@
-#include "cppack/cppack.hpp"
 #include <make/make_generator.hpp>
 
-#include <utility/file.hpp>
-#include <project_data/project_data.hpp>
+#include <cppack/cppack.hpp>
 #include <project_data/project_data_exceptions.hpp>
 #include <make/compiler_options.hpp>
 
@@ -130,8 +128,8 @@ void generateMakefileFromProject(const std::string& fileToSave, const CPPack& pr
 	make.variable("CURRENT_BUILD_SETTING", data.currentBuildSetting);
 	make.newline();
 
-	make.variable("SOURCE_PATH", project.getFullSourcePath());
-	make.variable("BUILD_PATH", project.getFullBuildPath());
+	make.variable("SOURCE_PATH", project.getAbsoluteSourcePath());
+	make.variable("BUILD_PATH", project.getAbsoluteBuildPath());
 	make.newline();
 
 	make.variable("COMPLETE_BUILD_PATH", "$(BUILD_PATH)/$(CURRENT_BUILD_SETTING)");
