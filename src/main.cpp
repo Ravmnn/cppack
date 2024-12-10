@@ -9,7 +9,6 @@
 // TODO: improve exception messages
 // TODO: add exception when building project with no source files
 // TODO: add a better way of throwing a exception if there's no project configuration file
-// TODO: add prefix "lib" on the build out file when project type is a library
 // TODO: use fs::path globally to represent path strings
 // TODO: add ProjectData property "additionalLibraryPaths" and "libraryDependencies"
 // TODO: code cleanup at cppack.cpp: methods getDependenciesXPaths can be improved

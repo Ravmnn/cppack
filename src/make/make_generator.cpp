@@ -98,9 +98,9 @@ static std::string getMakefileCommandForLinkingProjectOfType(const ProjectType t
 {
 	switch (type)
 	{
-		case ProjectType::Executable: return (std::string)"$(CPP_COMPILER) $(OBJECTS) -o $(BIN_PATH) $(CPP_OPTIONS)";
-		case ProjectType::StaticLibrary: return (std::string)"ar rcs $(BIN_PATH) $(OBJECTS)";
-		case ProjectType::SharedLibrary: return (std::string)"$(CPP_COMPILER) $(OBJECTS) -o $(BIN_PATH) -shared -fPIC $(CPP_OPTIONS)";
+		case ProjectType::Executable: return (std::string)"$(CPP_COMPILER) $(OBJECTS) -o $(BIN_PATH) $(CPP_LINKER_OPTIONS)"; // links all dependency libraries
+		case ProjectType::StaticLibrary: return (std::string)"ar rcs $(BIN_PATH) $(OBJECTS)";                                // does not links any dependency
+		case ProjectType::SharedLibrary: return (std::string)"$(CPP_COMPILER) $(OBJECTS) -o $(BIN_PATH) -shared -fPIC";      // does not links any dependency
 
 		default: return "invalid";
 	}
@@ -130,8 +130,8 @@ void generateMakefileFromProject(const std::string& fileToSave, const CPPack& pr
 	make.variable("CURRENT_BUILD_SETTING", data.currentBuildSetting);
 	make.newline();
 
-	make.variable("SOURCE_PATH", data.sourceDirectory);
-	make.variable("BUILD_PATH", data.buildDirectory);
+	make.variable("SOURCE_PATH", project.getFullSourcePath());
+	make.variable("BUILD_PATH", project.getFullBuildPath());
 	make.newline();
 
 	make.variable("COMPLETE_BUILD_PATH", "$(BUILD_PATH)/$(CURRENT_BUILD_SETTING)");
@@ -158,7 +158,8 @@ void generateMakefileFromProject(const std::string& fileToSave, const CPPack& pr
 	make.variable("CPP_ADDITIONAL_OPTIONS", buildSetting->additionalOptions);
 	make.newline();
 
-	make.variable("CPP_OPTIONS", "$(CPP_VERSION) $(CPP_INCLUDE_PATHS) $(CPP_LIBRARIES_PATHS) $(CPP_LIBRARIES) $(CPP_OPTIMIZATION) $(CPP_WARNING) $(CPP_DEFINES) $(CPP_ADDITIONAL_OPTIONS)");
+	make.variable("CPP_COMPILER_OPTIONS", "$(CPP_VERSION) $(CPP_INCLUDE_PATHS) $(CPP_OPTIMIZATION) $(CPP_WARNING) $(CPP_DEFINES) $(CPP_ADDITIONAL_OPTIONS)");
+	make.variable("CPP_LINKER_OPTIONS", "$(CPP_LIBRARIES_PATHS) $(CPP_LIBRARIES)");
 	make.newline(2);
 
 	make.rule("build", "$(BIN_PATH)", true);
@@ -174,7 +175,7 @@ void generateMakefileFromProject(const std::string& fileToSave, const CPPack& pr
 
 	make.patternRule("$(OBJECTS)", "$(OBJECT_PATH)/%.o", "$(SOURCE_PATH)/%.cpp");
 		make.ruleCommand("mkdir $(dir $@) -p");
-		make.ruleCommand("$(CPP_COMPILER) -c $< -o $@ $(CPP_OPTIONS)");
+		make.ruleCommand("$(CPP_COMPILER) -c $< -o $@ $(CPP_COMPILER_OPTIONS)");
 
 
 	writeFile(fileToSave, make.get());

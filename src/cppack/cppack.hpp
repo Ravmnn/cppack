@@ -61,6 +61,7 @@ public:
 	std::vector<std::string> getAllLibraryPaths() const noexcept;
 
 	std::string getFullBuildPath() const noexcept;
+	std::string getFullFinalBuildPath() const noexcept;
 	std::string getFullHeaderPath() const noexcept;
 	std::string getFullSourcePath() const noexcept;
 

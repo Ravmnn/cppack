@@ -1,4 +1,3 @@
-#include <cctype>
 #include <cppack/cppack.hpp>
 
 #include <utility/file.hpp>
@@ -228,7 +227,7 @@ std::vector<std::string> CPPack::getDependenciesLibraryPaths() const noexcept
 	{
 		CPPack package = getPackage(dependency);
 
-		libraryPaths.push_back(package.getFullBuildPath());
+		libraryPaths.push_back(package.getFullFinalBuildPath());
 		insertAtEnd(libraryPaths, package.getDependenciesLibraryPaths());
 	}
 
@@ -263,6 +262,12 @@ std::vector<std::string> CPPack::getAllLibraryPaths() const noexcept
 
 
 std::string CPPack::getFullBuildPath() const noexcept
+{
+	return toAbsolutePath(getData().buildDirectory);
+}
+
+
+std::string CPPack::getFullFinalBuildPath() const noexcept
 {
 	const ProjectData data = getData();
 	return toAbsolutePath(data.buildDirectory) / data.currentBuildSetting;
@@ -335,6 +340,15 @@ bool CPPack::isPackageRegistered(const std::string& name) noexcept
 			return true;
 
 	return false;
+}
+
+
+
+CPPack CPPack::getPackage(const std::string& name)
+{
+	InvalidPackageIndexHandling::throwIfNotRegistered(name);
+
+	return CPPack(cppackIndexDirectoryPath / name);
 }
 
 
