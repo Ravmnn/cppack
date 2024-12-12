@@ -1,3 +1,11 @@
+## Table of Contents
+
+- [About](#about)
+- [Usage](#usage)
+- [License](#license)
+- [Dependencies](#dependencies)
+- [Building](#building)
+
 ## About
 
 *cppack* is a simple command line tool made in C++ for handling C++ projects in a more user-friendly way, without the need of directly editing a Makefile or using CMake for compiling it.
@@ -31,12 +39,5 @@ This project uses the following libraries as dependencies:
 
 ## Building
 
-You must have `make` installed for building this project. Support for building using *cppack* itself
-will be added soon.
-
-
-```
-git clone https://github.com/Ravmnn/cppack
-cd cppack
-make MODE=release
-```
+Currently, the only easy way of compiling *cppack* is to use *cppack*
+itself, so you would need to install the already compiled version of it, then compile the project. Support for using GNU Make will come soon.

@@ -1,28 +1,28 @@
 {
-	"name": "cppack",
-	"type": "library",
-	"dependencies": [],
-	"source_directory": "src",
-	"header_directory": "include",
-	"build_directory": "build",
-	"additional_include_paths": [],
-	"language_compiler": "clang++",
-	"language_version": 20,
-	"current_build_setting": "debug",
-	"build_settings": [
-		{
-			"name": "debug",
-			"optimization": "debug",
-			"warning": "normal",
-			"defines": [],
-			"additional_options": ""
-		},
-		{
-			"name": "release",
-			"optimization": "high",
-			"warning": "none",
-			"defines": [],
-			"additional_options": ""
-		}
-	]
+  "name": "cppack",
+  "type": "executable",
+  "dependencies": [],
+  "source_directory": "src",
+  "header_directory": "src",
+  "build_directory": "build",
+  "additional_include_paths": ["third_party/CLI11/include", "third_party/nlohmann_json/include"],
+  "language_compiler": "clang++",
+  "language_version": 20,
+  "current_build_setting": "debug",
+  "build_settings": [
+    {
+      "name": "debug",
+      "optimization": "debug",
+      "warning": "all",
+      "defines": [],
+      "additional_options": ""
+    },
+    {
+      "name": "release",
+      "optimization": "high",
+      "warning": "none",
+      "defines": [],
+      "additional_options": ""
+    }
+  ]
 }
