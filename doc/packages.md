@@ -7,6 +7,8 @@
 
 Packages are [Projects](/doc/projects.md) that are stored in the global package index. That means only directories with a project file will be interpreted as packages. The global package index is a directory where *cppack* stores all packages. It's located at `~/.cppack/index`. The main feature of packages is that they can be used as dependencies by other projects and packages. Note that only library projects can be used as packages. Using packages as dependencies is easier than handling dependencies yourself, since *cppack* handles them automatically, avoiding the need of explicitly adding include paths and manually configuring the compiler.
 
+The subcommand responsible for handling packages in your project is `cppack package`
+
 ## Registering/Unregistering Packages
 
 Registering a package is just a fancy name for adding it to the global package index. To do so, use the subcommand `cppack index register [packagePath]?`.

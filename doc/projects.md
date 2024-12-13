@@ -29,10 +29,10 @@ Full command example: `cppack project init static-library myprojectname`
 
 ### Building/Running a Project
 
-To run or build a project, you can use the subcommands `cppack project build` and `cppack project run`, respectively. Note that if your project is library, it can't be directly runned. For more information about the building process, see [Building](/doc/building.md).
+To run or build a project, you can use the subcommands `cppack project build` and `cppack project run`, respectively. Note that if your project is library, it can't be directly runned.
 
 ### Adding/Removing a Package or a Dependency
 
-Currently, *cppack's* features for managing dependencies are limited and the main feature for doing so is by using packages. If your dependency can't currently be represented by *cppack*'s types of projects, you still may be able to build your project. For more information, see [Limitations](/doc/limitations.md). However, if your dependency can be represented as a *cppack* project, you can register it as a package and use it as a dependency without any problems. For more information about registering packages, see [Packages](/doc/packages.md)
+Currently, *cppack's* features for managing dependencies are limited and the main feature for doing so is by using packages. If your dependency can't currently be represented by *cppack*'s types of projects, you still may be able to build your project. However, if your dependency can be represented as a *cppack* project, you can register it as a package and use it as a dependency without any problems. For more information about registering packages, see [Packages](/doc/packages.md)
 
 For adding or removing a package to your project, you can use the commands `cppack package add [packageName]` and `cppack package remove [packageName]`, respectively.
