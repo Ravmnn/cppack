@@ -4,8 +4,8 @@
     // name of the project.
     "name": "cppack",
 
-    // executable or library.
-    "type": "library",
+    // executable, static-library or shared-library.
+    "type": "static-library",
 
     // the name of the dependencies.
     "dependencies": ["Dep1", "Dep2"],
@@ -14,7 +14,7 @@
     "source_directory": "src",
 
     // path to the directory storing the .hpp/.h files.
-    // if not defined, "source_path" will be used.
+    // if not defined, "source_directory" will be used.
     "header_directory": "include",
 
     // name of the directory to be used for storing build files
@@ -47,8 +47,8 @@
             //   -w,         -Wall,   (-Wall and -Wextra)
             "warning": "normal",
 
-            // macros with no value to be defined.
-            "defines": [],
+            // macros to be defined.
+            "defines": ["HELLO=\"hello, world\"", "DEBUGMODE"],
 
             // additional options passed to the compiler.
             "additional_options": ""
