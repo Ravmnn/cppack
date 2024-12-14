@@ -1,11 +1,11 @@
 #include <commands/project.hpp>
 
-#include <cppack/cppack_exceptions.hpp>
+#include <project/project_exceptions.hpp>
 
 
 
-CommandProjectInit::CommandProjectInit(CPPack* const cppack, CLI::App* const app)
-	: Command(cppack, app, "init", "Creates a new project")
+CommandProjectInit::CommandProjectInit(Project* const project, CLI::App* const app)
+	: Command(project, app, "init", "Creates a new project")
 {
 	thisCommand->add_option("projectType", _projectType)->required();
     thisCommand->add_option("projectName", _projectName);
@@ -24,8 +24,8 @@ void CommandProjectInit::run()
 
 
 
-CommandProjectInfo::CommandProjectInfo(CPPack* const cppack, CLI::App* const app)
-	: Command(cppack, app, "info", "Prints information about the current project")
+CommandProjectInfo::CommandProjectInfo(Project* const project, CLI::App* const app)
+	: Command(project, app, "info", "Prints information about the current project")
 {}
 
 
@@ -33,15 +33,15 @@ void CommandProjectInfo::run()
 {
 	InvalidProjectHandlingException::throwIfHasNotProjectFile();
 
-	ProjectDataManager(cppack->getData()).print();
+	ProjectDataManager(project->getData()).print();
 }
 
 
 
 
 
-CommandProjectBuild::CommandProjectBuild(CPPack* const cppack, CLI::App* const app)
-	: Command(cppack, app, "build", "Builds the project")
+CommandProjectBuild::CommandProjectBuild(Project* const project, CLI::App* const app)
+	: Command(project, app, "build", "Builds the project")
 {}
 
 
@@ -49,15 +49,15 @@ void CommandProjectBuild::run()
 {
 	InvalidProjectHandlingException::throwIfHasNotProjectFile();
 
-	cppack->buildProject();
+	project->buildProject();
 }
 
 
 
 
 
-CommandProjectRun::CommandProjectRun(CPPack* const cppack, CLI::App* const app)
-	: Command(cppack, app, "run", "Runs the project, if possible")
+CommandProjectRun::CommandProjectRun(Project* const project, CLI::App* const app)
+	: Command(project, app, "run", "Runs the project, if possible")
 {}
 
 
@@ -65,15 +65,15 @@ void CommandProjectRun::run()
 {
 	InvalidProjectHandlingException::throwIfHasNotProjectFile();
 
-	cppack->runProject();
+	project->runProject();
 }
 
 
 
 
 
-CommandProjectClean::CommandProjectClean(CPPack* const cppack, CLI::App* const app)
-	: Command(cppack, app, "clean", "Deletes build files")
+CommandProjectClean::CommandProjectClean(Project* const project, CLI::App* const app)
+	: Command(project, app, "clean", "Deletes build files")
 {}
 
 
@@ -81,5 +81,5 @@ void CommandProjectClean::run()
 {
 	InvalidProjectHandlingException::throwIfHasNotProjectFile();
 
-	cppack->cleanProject();
+	project->cleanProject();
 }

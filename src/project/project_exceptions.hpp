@@ -5,6 +5,7 @@
 
 
 class CPPack;
+class Project;
 
 
 class InvalidProjectHandlingException : public CPPackException
@@ -31,6 +32,6 @@ public:
 	static void throwIfRegistered(const std::string& name);
 	static void throwIfNotRegistered(const std::string& name);
 
-	static void throwIfIsDependency(const CPPack& project, const std::string& dependencyName);
-	static void throwIfIsNotDependency(const CPPack& project, const std::string& dependencyName);
+	static void throwIfIsDependency(const Project& project, const std::string& dependencyName);
+	static void throwIfIsNotDependency(const Project& project, const std::string& dependencyName);
 };

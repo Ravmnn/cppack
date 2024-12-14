@@ -1,9 +1,11 @@
 #include <commands/index.hpp>
 
+#include <package/global_index.hpp>
 
 
-CommandIndexRegister::CommandIndexRegister(CPPack* const cppack, CLI::App* const app)
-	: Command(cppack, app, "register", "Registers a new package to the global index")
+
+CommandIndexRegister::CommandIndexRegister(Project* const project, CLI::App* const app)
+	: Command(project, app, "register", "Registers a new package to the global index")
 {
 	_packagePath = ".";
 	thisCommand->add_option("packagePath", _packagePath);
@@ -12,15 +14,15 @@ CommandIndexRegister::CommandIndexRegister(CPPack* const cppack, CLI::App* const
 
 void CommandIndexRegister::run()
 {
-	CPPack::registerPackage(CPPack(_packagePath));
+	GlobalPackageIndex::registerPackage(Project(_packagePath));
 }
 
 
 
 
 
-CommandIndexUnregister::CommandIndexUnregister(CPPack* const cppack, CLI::App* const app)
-	: Command(cppack, app, "unregister", "Unregisters a package from the global index")
+CommandIndexUnregister::CommandIndexUnregister(Project* const project, CLI::App* const app)
+	: Command(project, app, "unregister", "Unregisters a package from the global index")
 {
 	thisCommand->add_option("packageName", _packageName)->required();
 }
@@ -28,15 +30,15 @@ CommandIndexUnregister::CommandIndexUnregister(CPPack* const cppack, CLI::App* c
 
 void CommandIndexUnregister::run()
 {
-	CPPack::unregisterPackage(_packageName);
+	GlobalPackageIndex::unregisterPackage(_packageName);
 }
 
 
 
 
 
-CommandIndexList::CommandIndexList(CPPack* const cppack, CLI::App* const app)
-	: Command(cppack, app, "list", "Lists all registered packages")
+CommandIndexList::CommandIndexList(Project* const project, CLI::App* const app)
+	: Command(project, app, "list", "Lists all registered packages")
 {}
 
 

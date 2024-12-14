@@ -11,7 +11,7 @@ private:
 
 
 public:
-	CommandIndexRegister(CPPack* cppack, CLI::App* app);
+	CommandIndexRegister(Project* project, CLI::App* app);
 
 
 	void run() override;
@@ -26,7 +26,7 @@ private:
 
 
 public:
-	CommandIndexUnregister(CPPack* cppack, CLI::App* app);
+	CommandIndexUnregister(Project* project, CLI::App* app);
 
 
 	void run() override;
@@ -37,7 +37,7 @@ public:
 class CommandIndexList : public Command
 {
 public:
-	CommandIndexList(CPPack* cppack, CLI::App* app);
+	CommandIndexList(Project* project, CLI::App* app);
 
 
 	void run() override;

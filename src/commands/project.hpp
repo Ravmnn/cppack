@@ -12,7 +12,7 @@ private:
 
 
 public:
-	CommandProjectInit(CPPack* cppack, CLI::App* app);
+	CommandProjectInit(Project* project, CLI::App* app);
 
 
 	void run() override;
@@ -23,7 +23,7 @@ public:
 class CommandProjectInfo : public Command
 {
 public:
-	CommandProjectInfo(CPPack* cppack, CLI::App* app);
+	CommandProjectInfo(Project* project, CLI::App* app);
 
 
 	void run() override;
@@ -34,7 +34,7 @@ public:
 class CommandProjectBuild : public Command
 {
 public:
-	CommandProjectBuild(CPPack* cppack, CLI::App* app);
+	CommandProjectBuild(Project* project, CLI::App* app);
 
 
 	void run() override;
@@ -45,7 +45,7 @@ public:
 class CommandProjectRun : public Command
 {
 public:
-	CommandProjectRun(CPPack* cppack, CLI::App* app);
+	CommandProjectRun(Project* project, CLI::App* app);
 
 
 	void run() override;
@@ -56,7 +56,7 @@ public:
 class CommandProjectClean : public Command
 {
 public:
-	CommandProjectClean(CPPack* cppack, CLI::App* app);
+	CommandProjectClean(Project* project, CLI::App* app);
 
 
 	void run() override;

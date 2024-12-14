@@ -1,7 +1,7 @@
 #include <make/make_generator.hpp>
 
 #include <cppack/cppack.hpp>
-#include <project_data/project_data_exceptions.hpp>
+#include <project/project_data_exceptions.hpp>
 #include <make/compiler_options.hpp>
 
 
@@ -105,7 +105,7 @@ static std::string getMakefileCommandForLinkingProjectOfType(const ProjectType t
 }
 
 
-void generateMakefileFromProject(const std::string& fileToSave, const CPPack& project)
+void generateMakefileFromProject(const std::string& fileToSave, const Project& project)
 {
 	const ProjectData data = project.getData();
 

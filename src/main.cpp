@@ -18,27 +18,27 @@ int main(int argc, char** argv)
     app.require_subcommand();
 
     CPPack::init();
-    CPPack cppack(fs::current_path());
+    Project currentProject(fs::current_path());
 
-    CLI::App* project = app.add_subcommand("project", "Subcommands for handling a project");
+    CLI::App* const project = app.add_subcommand("project", "Subcommands for handling a project");
 
-    new CommandProjectInit(&cppack, project);
-    new CommandProjectInfo(&cppack, project);
-    new CommandProjectBuild(&cppack, project);
-    new CommandProjectRun(&cppack, project);
-    new CommandProjectClean(&cppack, project);
+    new CommandProjectInit(&currentProject, project);
+    new CommandProjectInfo(&currentProject, project);
+    new CommandProjectBuild(&currentProject, project);
+    new CommandProjectRun(&currentProject, project);
+    new CommandProjectClean(&currentProject, project);
 
-    CLI::App* index = app.add_subcommand("index", "Subcommands for handling the cppack global package index");
+    CLI::App* const index = app.add_subcommand("index", "Subcommands for handling the cppack global package index");
 
-    new CommandIndexRegister(&cppack, index);
-    new CommandIndexUnregister(&cppack, index);
-    new CommandIndexList(&cppack, index);
+    new CommandIndexRegister(&currentProject, index);
+    new CommandIndexUnregister(&currentProject, index);
+    new CommandIndexList(&currentProject, index);
 
-    CLI::App* package = app.add_subcommand("package", "Subcommands for handling the project package dependencies");
+    CLI::App* const package = app.add_subcommand("package", "Subcommands for handling the project package dependencies");
 
-    new CommandPackageAdd(&cppack, package);
-    new CommandPackageRemove(&cppack, package);
-    new CommandPackageList(&cppack, package);
+    new CommandPackageAdd(&currentProject, package);
+    new CommandPackageRemove(&currentProject, package);
+    new CommandPackageList(&currentProject, package);
 
 
     try

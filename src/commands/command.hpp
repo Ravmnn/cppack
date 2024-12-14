@@ -18,12 +18,12 @@ protected:
 
 
 public:
-	CPPack* const cppack;
+	Project* const project;
 
 
 	Command() = delete;
 
-	Command(CPPack* cppack, CLI::App* app, const std::string& name, const std::string& description);
+	Command(Project* project, CLI::App* app, const std::string& name, const std::string& description);
 
 
 	CLI::App* get_app() const noexcept { return app; }

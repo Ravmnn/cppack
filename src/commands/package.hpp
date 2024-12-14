@@ -11,7 +11,7 @@ private:
 
 
 public:
-	CommandPackageAdd(CPPack* cppack, CLI::App* app);
+	CommandPackageAdd(Project* project, CLI::App* app);
 
 
 	void run() override;
@@ -26,7 +26,7 @@ private:
 
 
 public:
-	CommandPackageRemove(CPPack* cppack, CLI::App* app);
+	CommandPackageRemove(Project* project, CLI::App* app);
 
 
 	void run() override;
@@ -37,7 +37,7 @@ public:
 class CommandPackageList : public Command
 {
 public:
-	CommandPackageList(CPPack* cppack, CLI::App* app);
+	CommandPackageList(Project* project, CLI::App* app);
 
 
 	void run() override;
