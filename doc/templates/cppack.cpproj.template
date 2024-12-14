@@ -23,6 +23,12 @@
     // additional paths for searching for .hpp/.h files.
     "additional_include_paths": [],
 
+    // additional paths for searching for libraries: .so/.a
+    "additional_library_paths": [],
+
+    // additional library names to link with
+    "additional_libraries": [],
+
     // the compiler to use
     "language_compiler": "clang++",
 

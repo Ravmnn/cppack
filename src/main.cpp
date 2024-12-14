@@ -5,8 +5,8 @@
 
 
 
+// TODO: improve project data property (too much boilerplate)
 // TODO: use fs::path globally to represent path strings
-// TODO: add ProjectData property "additionalLibraryPaths" and "libraryDependencies"
 // TODO: code cleanup at cppack.cpp: methods getDependenciesXPaths can be improved
 // TODO: generates "src/[projectname]" and "include/[projectname]"
 
@@ -19,7 +19,6 @@ int main(int argc, char** argv)
 
     CPPack::init();
     CPPack cppack(fs::current_path());
-
 
     CLI::App* project = app.add_subcommand("project", "Subcommands for handling a project");
 

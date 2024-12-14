@@ -205,6 +205,8 @@ const JsonPropertyValidationRequirements ProjectData::prop_sourceDirectory = { "
 const JsonPropertyValidationRequirements ProjectData::prop_headerDirectory = { "header_directory", json::value_t::string };
 const JsonPropertyValidationRequirements ProjectData::prop_buildDirectory = { "build_directory", json::value_t::string };
 const JsonPropertyValidationRequirements ProjectData::prop_additionalIncludePaths = { "additional_include_paths", json::value_t::array, json::value_t::string };
+const JsonPropertyValidationRequirements ProjectData::prop_additionalLibraryPaths = { "additional_library_paths", json::value_t::array, json::value_t::string };
+const JsonPropertyValidationRequirements ProjectData::prop_additionalLibraries = { "additional_libraries", json::value_t::array, json::value_t::string };
 const JsonPropertyValidationRequirements ProjectData::prop_languageCompiler = { "language_compiler", json::value_t::string };
 const JsonPropertyValidationRequirements ProjectData::prop_languageVersion = { "language_version", json::value_t::number_unsigned };
 const JsonPropertyValidationRequirements ProjectData::prop_currentBuildSetting = { "current_build_setting", json::value_t::string };
@@ -215,7 +217,8 @@ const JsonPropertyValidationRequirements ProjectData::prop_buildSettings = { "bu
 ProjectData::ProjectData(const json& jsonData)
 	: JsonPropertiesValidator({
 		prop_name, prop_type, prop_dependencies, prop_sourceDirectory,
-		prop_headerDirectory, prop_additionalIncludePaths, prop_currentBuildSetting, prop_buildSettings
+		prop_headerDirectory, prop_buildDirectory, prop_additionalIncludePaths, prop_additionalLibraryPaths,
+		prop_additionalLibraries, prop_languageCompiler, prop_languageVersion, prop_currentBuildSetting, prop_buildSettings
 	})
 {
 	fromJson(jsonData);
@@ -249,6 +252,8 @@ void ProjectData::fromJson(const json& jsonData)
     headerDirectory = jsonData[prop_headerDirectory.name];
     buildDirectory = jsonData[prop_buildDirectory.name];
     additionalIncludePaths = convertJsonStringArrayToVector(jsonData[prop_additionalIncludePaths.name]);
+    additionalLibraryPaths = convertJsonStringArrayToVector(jsonData[prop_additionalLibraryPaths.name]);
+    additionalLibraries = convertJsonStringArrayToVector(jsonData[prop_additionalLibraries.name]);
     languageCompiler = jsonData[prop_languageCompiler.name];
     languageVersion = jsonData[prop_languageVersion.name];
     currentBuildSetting = jsonData[prop_currentBuildSetting.name];
@@ -266,6 +271,8 @@ json ProjectData::toJson() const noexcept
 		{ prop_headerDirectory.name, headerDirectory },
 		{ prop_buildDirectory.name, buildDirectory },
 		{ prop_additionalIncludePaths.name, additionalIncludePaths },
+		{ prop_additionalLibraryPaths.name, additionalLibraryPaths },
+		{ prop_additionalLibraries.name, additionalLibraries },
 		{ prop_languageCompiler.name, languageCompiler },
 		{ prop_languageVersion.name, languageVersion },
 		{ prop_currentBuildSetting.name, currentBuildSetting },
@@ -296,6 +303,8 @@ void ProjectDataManager::print() const noexcept
     std::cout << "header directory: " << _data.headerDirectory << std::endl;
     std::cout << "build directory: " << _data.buildDirectory << std::endl;
     std::cout << "additional include paths: " << joinStringVector(_data.additionalIncludePaths, ", ") << std::endl;
+    std::cout << "additional library paths: " << joinStringVector(_data.additionalLibraryPaths, ", ") << std::endl;
+    std::cout << "additional libraries: " << joinStringVector(_data.additionalLibraries, ", ") << std::endl;
 
     std::cout << "language compiler: " << _data.languageCompiler << std::endl;
     std::cout << "language version: " << _data.languageVersion << std::endl;

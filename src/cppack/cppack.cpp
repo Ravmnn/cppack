@@ -4,6 +4,8 @@
 #include <cppack/cppack_exceptions.hpp>
 #include <make/make_generator.hpp>
 
+#include <log.hpp>
+
 
 
 const fs::path CPPack::cppackDirectoryPath = getHomeDirectoryPath().append(".cppack");
@@ -166,20 +168,31 @@ std::vector<std::string> CPPack::getIncludePaths(bool includeProject) const noex
 
 std::vector<std::string> CPPack::getLibraryPaths(bool includeProject) const noexcept
 {
-	// const ProjectData projectData = getData();
-
 	std::vector<std::string> libraryPaths;
-	// std::vector<std::string> additionalPaths;
+	std::vector<std::string> additionalPaths;
 
-	// for (const std::string& path : projectData.additionalIncludePaths)
-	// 	additionalPaths.push_back(toAbsolutePath(path));
+	for (const std::string& path : getData().additionalLibraryPaths)
+		additionalPaths.push_back(toAbsoluteProjectPath(path));
 
 	if (includeProject)
 		libraryPaths.push_back(getAbsoluteSourcePath());
 
-	// insertAtEnd(libraryPaths, additionalPaths);
+	insertAtEnd(libraryPaths, additionalPaths);
 
 	return libraryPaths;
+}
+
+
+std::vector<std::string> CPPack::getLibraries() const noexcept
+{
+	const ProjectData projectData = getData();
+
+	std::vector<std::string> libraries;
+
+	insertAtEnd(libraries, projectData.dependencies);
+	insertAtEnd(libraries, projectData.additionalLibraries);
+
+	return libraries;
 }
 
 
@@ -215,6 +228,22 @@ std::vector<std::string> CPPack::getDependenciesLibraryPaths() const noexcept
 }
 
 
+std::vector<std::string> CPPack::getDependenciesLibraries() const noexcept
+{
+	std::vector<std::string> libraries;
+
+	for (const std::string& dependency : getData().dependencies)
+	{
+		CPPack package = getPackage(dependency);
+
+		insertAtEnd(libraries, package.getLibraries());
+		insertAtEnd(libraries, package.getDependenciesLibraries());
+	}
+
+	return libraries;
+}
+
+
 std::vector<std::string> CPPack::getAllIncludePaths() const noexcept
 {
 	std::vector<std::string> includePaths;
@@ -235,6 +264,17 @@ std::vector<std::string> CPPack::getAllLibraryPaths() const noexcept
 	insertAtEnd(libraryPaths, getDependenciesLibraryPaths());
 
 	return libraryPaths;
+}
+
+
+std::vector<std::string> CPPack::getAllLibraries() const noexcept
+{
+	std::vector<std::string> libraries;
+
+	insertAtEnd(libraries, getLibraries());
+	insertAtEnd(libraries, getDependenciesLibraries());
+
+	return libraries;
 }
 
 

@@ -108,6 +108,7 @@ static std::string getMakefileCommandForLinkingProjectOfType(const ProjectType t
 void generateMakefileFromProject(const std::string& fileToSave, const CPPack& project)
 {
 	const ProjectData data = project.getData();
+
 	const BuildSetting* buildSetting = data.buildSetting();
 
 	if (!buildSetting)
@@ -148,8 +149,10 @@ void generateMakefileFromProject(const std::string& fileToSave, const CPPack& pr
 	make.newline();
 
 	make.listVariableWithPrefix("CPP_INCLUDE_PATHS", "-I", project.getAllIncludePaths());
-	make.listVariableWithPrefix("CPP_LIBRARIES_PATHS", "-L", project.getAllLibraryPaths());
-	make.listVariableWithPrefix("CPP_LIBRARIES", "-l", data.dependencies);
+
+	make.listVariableWithPrefix("CPP_LIBRARY_PATHS", "-L", project.getAllLibraryPaths());
+	make.listVariableWithPrefix("CPP_LIBRARIES", "-l", project.getAllLibraries());
+
 	make.variable("CPP_OPTIMIZATION", buildOptimizationTypeToCompilerOption(buildSetting->optimizationType));
 	make.variable("CPP_WARNING", buildWarningTypeToCompilerOption(buildSetting->warningType));
 	make.listVariableWithPrefix("CPP_DEFINES", "-D", buildSetting->defines);
