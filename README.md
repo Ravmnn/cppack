@@ -40,4 +40,4 @@ This project uses the following libraries as dependencies:
 ## Building
 
 Currently, the only easy way of compiling *cppack* is to use *cppack*
-itself, so you would need to install the already compiled version of it, then compile the project. Support for using GNU Make will come soon.
+itself, so you would need to install the already compiled version of it, then compile the project. Support for using GNU Make will be added soon.
