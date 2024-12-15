@@ -7,7 +7,7 @@
 void createDirectoryIfNotExists(const std::string& name) noexcept
 {
 	if (!fs::exists(name))
-		fs::create_directory(name);
+		fs::create_directories(name);
 }
 
 

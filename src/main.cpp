@@ -5,9 +5,6 @@
 
 
 
-// TODO: improve project data property (too much boilerplate)
-// TODO: use fs::path globally to represent path strings
-// TODO: code cleanup at cppack.cpp: methods getDependenciesXPaths can be improved
 // TODO: generates "src/[projectname]" and "include/[projectname]"
 
 

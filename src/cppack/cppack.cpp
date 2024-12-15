@@ -59,8 +59,8 @@ ProjectData CPPack::generateDefaultProjectData(const std::string& name, const Pr
 
 	data.name = (name.empty() ? fs::current_path().stem().string() : name);
 	data.type = type;
-	data.sourceDirectory = "src";
-	data.headerDirectory = (type == ProjectType::Executable ? data.sourceDirectory : "include");
+	data.sourceDirectory = (type == ProjectType::Executable ? "src" : "src/" + data.name);
+	data.headerDirectory = (type == ProjectType::Executable ? data.sourceDirectory : "include/" + data.name);
 	data.buildDirectory = "build";
 	data.currentBuildSetting = "debug";
 	data.languageCompiler = "clang++";
