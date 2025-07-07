@@ -83,3 +83,19 @@ void CommandProjectClean::run()
 
 	project->cleanProject();
 }
+
+
+
+
+
+CommandProjectMakefy::CommandProjectMakefy(Project* const project, CLI::App* const app)
+	: Command(project, app, "makefy", "Generates an independent Makefile system")
+{}
+
+
+void CommandProjectMakefy::run()
+{
+	InvalidProjectHandlingException::throwIfHasNotProjectFile();
+
+	project->makefyProject();
+}

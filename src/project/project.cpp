@@ -1,7 +1,10 @@
 #include <project/project.hpp>
 
+#include <filesystem>
+
 #include <utility/vector.hpp>
 #include <package/global_index.hpp>
+#include <project/project_data.hpp>
 #include <project/project_exceptions.hpp>
 #include <cppack/cppack.hpp>
 #include <make/make_generator.hpp>
@@ -9,7 +12,7 @@
 
 
 const std::string Project::projectFileExtension = ".cpproj";
-const std::string Project::buildMakefileName = "Makefile";
+const std::string Project::makefileName = "Makefile";
 
 
 
@@ -64,8 +67,8 @@ std::string Project::getProjectFullOutFileName() const noexcept
 
 void Project::buildProject() const
 {
-	createDirectoryIfNotExists(getAbsoluteBuildPath());
-	generateMakefileFromProject(getAbsoluteMakefilePath(), *this);
+	createDirectoryIfNotExists(getBuildPath());
+	generateMakefileFromProject(getMakefilePath(), *this);
 
 	buildProjectDependencies();
 
@@ -98,13 +101,20 @@ void Project::cleanProject() const
 
 void Project::runProjectMakefile(const std::string& makeRule) const
 {
-	const std::string path = getAbsoluteMakefilePath();
+	const std::string path = getMakefilePath();
 	const std::string command = "make " + makeRule + " -s -f " + path;
 
 	if (!fs::exists(path))
 		throw InvalidProjectHandlingException("Could not find Makefile: " + path);
 
 	system(command.c_str());
+}
+
+
+void Project::makefyProject() const
+{
+	generateIndependentMakefilesFromBuildSettings("mkfiles", *this);
+	generateIndependentMakefileFromProject(getIndependentMakefilePath(), *this);
 }
 
 
@@ -144,16 +154,16 @@ bool Project::isPackageADependency(const std::string& name) const noexcept
 
 
 
-std::vector<std::string> Project::getIncludePaths(bool includeProject) const noexcept
+std::vector<std::string> Project::getIncludePaths(const bool includeProject, const bool absolutePaths) const noexcept
 {
 	std::vector<std::string> includePaths;
 	std::vector<std::string> additionalPaths;
 
 	for (const std::string& path : getData().additionalIncludePaths)
-		additionalPaths.push_back(toAbsoluteProjectPath(path));
+		additionalPaths.push_back(absolutePaths ? toAbsoluteProjectPath(path).string() : path);
 
 	if (includeProject)
-		includePaths.push_back(getAbsoluteHeaderPath());
+		includePaths.push_back(getHeaderPath(absolutePaths));
 
 	insertAtEnd(includePaths, additionalPaths);
 
@@ -161,16 +171,16 @@ std::vector<std::string> Project::getIncludePaths(bool includeProject) const noe
 }
 
 
-std::vector<std::string> Project::getLibraryPaths(bool includeProject) const noexcept
+std::vector<std::string> Project::getLibraryPaths(const bool includeProject, const bool absolutePaths) const noexcept
 {
 	std::vector<std::string> libraryPaths;
 	std::vector<std::string> additionalPaths;
 
 	for (const std::string& path : getData().additionalLibraryPaths)
-		additionalPaths.push_back(toAbsoluteProjectPath(path));
+		additionalPaths.push_back(absolutePaths ? toAbsoluteProjectPath(path).string() : path);
 
 	if (includeProject)
-		libraryPaths.push_back(getAbsoluteSourcePath());
+		libraryPaths.push_back(getSourcePath(absolutePaths));
 
 	insertAtEnd(libraryPaths, additionalPaths);
 
@@ -239,23 +249,23 @@ std::vector<std::string> Project::getDependenciesLibraries() const noexcept
 }
 
 
-std::vector<std::string> Project::getAllIncludePaths() const noexcept
+std::vector<std::string> Project::getAllIncludePaths(const bool absolutePaths) const noexcept
 {
 	std::vector<std::string> includePaths;
 
-	insertAtEnd(includePaths, getIncludePaths());
+	insertAtEnd(includePaths, getIncludePaths(true, absolutePaths));
 	insertAtEnd(includePaths, getDependenciesIncludePaths());
 
 	return includePaths;
 }
 
 
-std::vector<std::string> Project::getAllLibraryPaths() const noexcept
+std::vector<std::string> Project::getAllLibraryPaths(const bool absolutePaths) const noexcept
 {
 	std::vector<std::string> libraryPaths;
 
 	// no need to include the project out library
-	insertAtEnd(libraryPaths, getLibraryPaths(false));
+	insertAtEnd(libraryPaths, getLibraryPaths(false, absolutePaths));
 	insertAtEnd(libraryPaths, getDependenciesLibraryPaths());
 
 	return libraryPaths;
@@ -276,33 +286,44 @@ std::vector<std::string> Project::getAllLibraries() const noexcept
 
 
 
-fs::path Project::getAbsoluteMakefilePath() const noexcept
+fs::path Project::getMakefilePath(const bool absolutePath) const noexcept
 {
-	return getAbsoluteBuildPath() / buildMakefileName;
+	return getBuildPath(absolutePath) / makefileName;
+}
+
+
+fs::path Project::getIndependentMakefilePath(const bool absolutePath) const noexcept
+{
+	return absolutePath ? getAbsoluteProjectPath() / makefileName : fs::path(makefileName);
 }
 
 
 
-fs::path Project::getAbsoluteBuildPath() const noexcept
-{
-	return toAbsoluteProjectPath(getData().buildDirectory);
-}
-
-
-fs::path Project::getAbsoluteFinalBuildPath() const noexcept
+fs::path Project::getBuildPath(const bool absolutePath) const noexcept
 {
 	const ProjectData data = getData();
-	return toAbsoluteProjectPath(data.buildDirectory) / data.currentBuildSetting;
+	return absolutePath ? getAbsoluteProjectPath() / data.buildDirectory : fs::path(data.buildDirectory);
 }
 
 
-fs::path Project::getAbsoluteHeaderPath() const noexcept
+fs::path Project::getFinalBuildPath(const bool absolutePath) const noexcept
 {
-	return toAbsoluteProjectPath(getData().headerDirectory);
+	const ProjectData data = getData();
+	const fs::path relativeFinalBuildPath = fs::path(data.buildDirectory) / data.currentBuildSetting;
+
+	return absolutePath ? getAbsoluteProjectPath() / relativeFinalBuildPath : relativeFinalBuildPath;
 }
 
 
-fs::path Project::getAbsoluteSourcePath() const noexcept
+fs::path Project::getHeaderPath(const bool absolutePath) const noexcept
 {
-	return toAbsoluteProjectPath(getData().sourceDirectory);
+	const ProjectData data = getData();
+	return absolutePath ? getAbsoluteProjectPath() / data.headerDirectory : fs::path(data.headerDirectory);
+}
+
+
+fs::path Project::getSourcePath(const bool absolutePath) const noexcept
+{
+	const ProjectData data = getData();
+	return absolutePath ? getAbsoluteProjectPath() / data.sourceDirectory : fs::path(data.sourceDirectory);
 }

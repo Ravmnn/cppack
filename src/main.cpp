@@ -5,7 +5,9 @@
 
 
 
-// TODO: generates "src/[projectname]" and "include/[projectname]"
+// TODO: be able to generate fully independent Makefile system (add library dependency management).
+// TODO: create a json property for the independent Makefiles directory.
+// TODO: be able to temporary specify the build setting when building or running (CLI).
 
 
 
@@ -17,25 +19,26 @@ int main(int argc, char** argv)
     CPPack::init();
     Project currentProject(fs::current_path());
 
-    CLI::App* const project = app.add_subcommand("project", "Subcommands for handling a project");
+    CLI::App* const projectSubcommand = app.add_subcommand("project", "Subcommands for handling a project");
 
-    new CommandProjectInit(&currentProject, project);
-    new CommandProjectInfo(&currentProject, project);
-    new CommandProjectBuild(&currentProject, project);
-    new CommandProjectRun(&currentProject, project);
-    new CommandProjectClean(&currentProject, project);
+    new CommandProjectInit(&currentProject, projectSubcommand);
+    new CommandProjectInfo(&currentProject, projectSubcommand);
+    new CommandProjectBuild(&currentProject, projectSubcommand);
+    new CommandProjectRun(&currentProject, projectSubcommand);
+    new CommandProjectClean(&currentProject, projectSubcommand);
+    new CommandProjectMakefy(&currentProject, projectSubcommand);
 
-    CLI::App* const index = app.add_subcommand("index", "Subcommands for handling the cppack global package index");
+    CLI::App* const indexSubcommand = app.add_subcommand("index", "Subcommands for handling the cppack global package index");
 
-    new CommandIndexRegister(&currentProject, index);
-    new CommandIndexUnregister(&currentProject, index);
-    new CommandIndexList(&currentProject, index);
+    new CommandIndexRegister(&currentProject, indexSubcommand);
+    new CommandIndexUnregister(&currentProject, indexSubcommand);
+    new CommandIndexList(&currentProject, indexSubcommand);
 
-    CLI::App* const package = app.add_subcommand("package", "Subcommands for handling the project package dependencies");
+    CLI::App* const packageSubcommand = app.add_subcommand("package", "Subcommands for handling the project package dependencies");
 
-    new CommandPackageAdd(&currentProject, package);
-    new CommandPackageRemove(&currentProject, package);
-    new CommandPackageList(&currentProject, package);
+    new CommandPackageAdd(&currentProject, packageSubcommand);
+    new CommandPackageRemove(&currentProject, packageSubcommand);
+    new CommandPackageList(&currentProject, packageSubcommand);
 
 
     try

@@ -61,3 +61,14 @@ public:
 
 	void run() override;
 };
+
+
+
+class CommandProjectMakefy : public Command
+{
+public:
+	CommandProjectMakefy(Project* project, CLI::App* app);
+
+
+	void run() override;
+};

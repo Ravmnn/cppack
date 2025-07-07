@@ -44,4 +44,6 @@ public:
 
 
 
-void generateMakefileFromProject(const std::string& fileToSave, const Project& project);
+void generateMakefileFromProject(const std::string& fileToSave, const Project& project, bool absolutePaths = true);
+void generateIndependentMakefileFromProject(const std::string& fileToSave, const Project& project);
+void generateIndependentMakefilesFromBuildSettings(const std::string& pathToSaveFiles, const Project& project);
