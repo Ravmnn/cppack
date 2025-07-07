@@ -39,5 +39,32 @@ This project uses the following libraries as dependencies:
 
 ## Building
 
-Currently, the only easy way of compiling *cppack* is to use *cppack*
-itself, so you would need to install the already compiled version of it, then compile the project. Support for using GNU Make will be added soon.
+You can compile this project by using cppack itself or by using the Makefile provided in the project root directory.
+
+
+### GNU Make
+
+You'll need clang++ with support fot C++20 or later. You may use other compilers as well, but
+you'll need to edit the Makefile and set the C++ compiler to the one you want to use. Also make sure to have GNU make tool. Once you have everything ready, you can compile the project by running:
+
+```
+make release
+```
+
+or
+
+```
+make debug
+```
+
+to build it without any optimizations (not recommended).
+
+
+### cppack
+
+You may also use cppack itself, which is kinda funny. Download a pre-compiled version and run the following
+command at the project's root directory:
+
+```
+cppack project build
+```
