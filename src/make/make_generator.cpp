@@ -1,3 +1,4 @@
+#include "utility/file.hpp"
 #include <make/make_generator.hpp>
 
 #include <cstdlib>
@@ -176,7 +177,7 @@ void generateMakefileFromProject(const std::string& fileToSave, const Project& p
 	make.rule("build", "$(BIN_PATH)", true);
 	make.newline(2);
 
-	make.rule("run", "", true);
+	make.rule("run", "$(BIN_PATH)", true);
 		make.ruleCommand("echo Running...");
 		make.ruleCommand("$(BIN_PATH)");
 	make.newline(2);
@@ -236,6 +237,8 @@ void generateIndependentMakefilesFromBuildSettings(const std::string& pathToSave
 {
 	const ProjectData oldData = project.getData();
 	ProjectData data = oldData;
+
+	createDirectoryIfNotExists(pathToSaveFiles);
 
 	for (const std::string& buildSettingName : BuildSetting::getBuildSettingNames(data.buildSettings))
 	{
