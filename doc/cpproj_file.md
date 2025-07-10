@@ -10,9 +10,6 @@ Every *cppack* project must have a `*.cpproj` file, which stores information abo
     // executable, static-library or shared-library.
     "type": "static-library",
 
-    // the name of the dependencies.
-    "dependencies": ["Dep1", "Dep2"],
-
     // path to the directory storing the .cpp/.c files.
     "source_directory": "src",
 
@@ -25,6 +22,12 @@ Every *cppack* project must have a `*.cpproj` file, which stores information abo
 
     // additional paths for searching for .hpp/.h files.
     "additional_include_paths": [],
+
+    // additional paths for searching for libraries: .so/.a
+    "additional_library_paths": [],
+
+    // additional library names to link with
+    "additional_libraries": [],
 
     // the compiler to use
     "language_compiler": "clang++",
@@ -63,4 +66,5 @@ Every *cppack* project must have a `*.cpproj` file, which stores information abo
         }
     ]
 }
+
 ```
