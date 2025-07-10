@@ -35,7 +35,6 @@ public:
 
 
 	void buildProject() const;
-	void buildProjectDependencies() const;
 	void runProject() const;
 	void cleanProject() const;
 	void runProjectMakefile(const std::string& makeRule) const;
@@ -43,20 +42,13 @@ public:
 	void makefyProject() const;
 
 
-	void addPackageDependency(const std::string& name) const;
-	void removePackageDependency(const std::string& name) const;
-	bool isPackageADependency(const std::string& name) const noexcept;
+private:
+	std::vector<std::string> getPaths(const std::string& main, const std::vector<std::string>& additional, bool includeProject = true, bool absolutePaths = true) const noexcept;
 
-
+public:
 	std::vector<std::string> getIncludePaths(bool includeProject = true, bool absolutePaths = true) const noexcept;
 	std::vector<std::string> getLibraryPaths(bool includeProject = true, bool absolutePaths = true) const noexcept;
 	std::vector<std::string> getLibraries() const noexcept;
-	std::vector<std::string> getDependenciesIncludePaths() const noexcept;
-	std::vector<std::string> getDependenciesLibraryPaths() const noexcept;
-	std::vector<std::string> getDependenciesLibraries() const noexcept;
-	std::vector<std::string> getAllIncludePaths(bool absolutePaths = true) const noexcept;
-	std::vector<std::string> getAllLibraryPaths(bool absolutePaths = true) const noexcept;
-	std::vector<std::string> getAllLibraries() const noexcept;
 
 
 	fs::path toAbsoluteProjectPath(const fs::path& other) const noexcept { return getAbsoluteProjectPath() / other; }

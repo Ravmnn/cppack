@@ -6,21 +6,6 @@
 
 
 
-const fs::path CPPack::cppackDirectoryPath = getHomeDirectoryPath().append(".cppack");
-const fs::path CPPack::cppackIndexDirectoryPath = CPPack::cppackDirectoryPath / "index";
-
-
-
-
-
-void CPPack::init() noexcept
-{
-	setupCppackGlobalEnvironment();
-}
-
-
-
-
 
 bool CPPack::directoryContainsProjectFile(const std::string& path, fs::path* const projectFilePath) noexcept
 {
@@ -95,11 +80,4 @@ void CPPack::setupProjectEnvironment(const ProjectData& data) noexcept
 	createDirectoryIfNotExists(data.headerDirectory);
 
 	ProjectDataManager::writeToFile(data, data.name + Project::projectFileExtension);
-}
-
-
-void CPPack::setupCppackGlobalEnvironment() noexcept
-{
-	createDirectoryIfNotExists(cppackDirectoryPath);
-	createDirectoryIfNotExists(cppackIndexDirectoryPath);
 }

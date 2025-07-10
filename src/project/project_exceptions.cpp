@@ -1,4 +1,3 @@
-#include "package/global_index.hpp"
 #include <project/project_exceptions.hpp>
 
 #include <cppack/cppack.hpp>
@@ -28,34 +27,4 @@ void InvalidProjectHandlingException::throwIfHasNotProjectFile()
 void InvalidProjectHandlingException::throwIfHasProjectFile()
 {
 	throwIfHasProjectFile(fs::current_path());
-}
-
-
-
-
-
-void InvalidPackageIndexHandling::throwIfRegistered(const std::string& name)
-{
-	if (GlobalPackageIndex::isPackageRegistered(name))
-		throw InvalidPackageIndexHandling("Package is registered");
-}
-
-
-void InvalidPackageIndexHandling::throwIfNotRegistered(const std::string& name)
-{
-	if (!GlobalPackageIndex::isPackageRegistered(name))
-		throw InvalidPackageIndexHandling("Package is not registered");
-}
-
-void InvalidPackageIndexHandling::throwIfIsDependency(const Project& project, const std::string& dependencyName)
-{
-	if (project.isPackageADependency(dependencyName))
-		throw InvalidPackageIndexHandling("Package is a dependency");
-}
-
-
-void InvalidPackageIndexHandling::throwIfIsNotDependency(const Project& project, const std::string& dependencyName)
-{
-	if (!project.isPackageADependency(dependencyName))
-		throw InvalidPackageIndexHandling("Package is not a dependency");
 }

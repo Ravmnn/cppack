@@ -200,7 +200,6 @@ std::vector<std::string> BuildSetting::getBuildSettingNames(const std::vector<Bu
 
 const JsonPropertyValidationRequirements ProjectData::prop_name = { "name", json::value_t::string };
 const JsonPropertyValidationRequirements ProjectData::prop_type = { "type", json::value_t::string };
-const JsonPropertyValidationRequirements ProjectData::prop_dependencies = { "dependencies", json::value_t::array, json::value_t::string };
 const JsonPropertyValidationRequirements ProjectData::prop_sourceDirectory = { "source_directory", json::value_t::string };
 const JsonPropertyValidationRequirements ProjectData::prop_headerDirectory = { "header_directory", json::value_t::string };
 const JsonPropertyValidationRequirements ProjectData::prop_buildDirectory = { "build_directory", json::value_t::string };
@@ -216,7 +215,7 @@ const JsonPropertyValidationRequirements ProjectData::prop_buildSettings = { "bu
 
 ProjectData::ProjectData(const json& jsonData)
 	: JsonPropertiesValidator({
-		prop_name, prop_type, prop_dependencies, prop_sourceDirectory,
+		prop_name, prop_type, prop_sourceDirectory,
 		prop_headerDirectory, prop_buildDirectory, prop_additionalIncludePaths, prop_additionalLibraryPaths,
 		prop_additionalLibraries, prop_languageCompiler, prop_languageVersion, prop_currentBuildSetting, prop_buildSettings
 	})
@@ -247,7 +246,6 @@ void ProjectData::fromJson(const json& jsonData)
 
     name = jsonData[prop_name.name];
     type = projectTypeFromString(jsonData[prop_type.name]);
-    dependencies = convertJsonStringArrayToVector(jsonData[prop_dependencies.name]);
     sourceDirectory = jsonData[prop_sourceDirectory.name];
     headerDirectory = jsonData[prop_headerDirectory.name];
     buildDirectory = jsonData[prop_buildDirectory.name];
@@ -266,7 +264,6 @@ json ProjectData::toJson() const noexcept
 	return {
 		{ prop_name.name, name },
 		{ prop_type.name, projectTypeToString(type) },
-		{ prop_dependencies.name, dependencies },
 		{ prop_sourceDirectory.name, sourceDirectory },
 		{ prop_headerDirectory.name, headerDirectory },
 		{ prop_buildDirectory.name, buildDirectory },
@@ -297,7 +294,6 @@ void ProjectDataManager::print() const noexcept
 {
     std::cout << "name: " << _data.name << std::endl;
     std::cout << "type: " << projectTypeToString(_data.type) << std::endl;
-    std::cout << "dependencies: " << joinStringVector(_data.dependencies, ", ") << std::endl;
 
     std::cout << "source directory: " << _data.sourceDirectory << std::endl;
     std::cout << "header directory: " << _data.headerDirectory << std::endl;

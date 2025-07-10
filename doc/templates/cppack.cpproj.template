@@ -7,9 +7,6 @@
     // executable, static-library or shared-library.
     "type": "static-library",
 
-    // the name of the dependencies.
-    "dependencies": ["Dep1", "Dep2"],
-
     // path to the directory storing the .cpp/.c files.
     "source_directory": "src",
 

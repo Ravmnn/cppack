@@ -20,7 +20,7 @@ OBJECTS = $(addprefix $(OBJECT_PATH)/, $(patsubst $(SOURCE_PATH)/%, %, $(SOURCES
 CPP_COMPILER = clang++
 CPP_VERSION = -std=c++20
 
-CPP_INCLUDE_PATHS = -Isrc -Ithird_party/CLI11/include -Ithird_party/nlohmann_json/include
+CPP_INCLUDE_PATHS = -I/home/marvin/Documentos/program/cpp/cppack/third_party/CLI11/include -I/home/marvin/Documentos/program/cpp/cppack/third_party/nlohmann_json/include
 CPP_LIBRARY_PATHS = 
 CPP_LIBRARIES = 
 CPP_OPTIMIZATION = -Og
@@ -37,7 +37,7 @@ build: $(BIN_PATH)
 
 
 .PHONY:
-run: 
+run: $(BIN_PATH)
 	@ echo Running...
 	@ $(BIN_PATH)
 

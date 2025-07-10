@@ -9,14 +9,8 @@
 class CPPack
 {
 public:
-	static const fs::path cppackDirectoryPath;
-	static const fs::path cppackIndexDirectoryPath;
-
-
 	CPPack() = delete;
 
-
-	static void init() noexcept;
 
 	static bool directoryContainsProjectFile(const std::string& path, fs::path* projectFilePath = nullptr) noexcept;
 	static bool directoryHierarchyContainsProjectFile(const std::string& path, fs::path* projectFilePath = nullptr) noexcept;

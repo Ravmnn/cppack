@@ -3,7 +3,6 @@
 #include <filesystem>
 
 #include <utility/vector.hpp>
-#include <package/global_index.hpp>
 #include <project/project_data.hpp>
 #include <project/project_exceptions.hpp>
 #include <cppack/cppack.hpp>
@@ -70,16 +69,7 @@ void Project::buildProject() const
 	createDirectoryIfNotExists(getBuildPath());
 	generateMakefileFromProject(getMakefilePath(), *this);
 
-	buildProjectDependencies();
-
 	runProjectMakefile("build");
-}
-
-
-void Project::buildProjectDependencies() const
-{
-	for (const std::string& dependency : getData().dependencies)
-		GlobalPackageIndex::getPackage(dependency).buildProject();
 }
 
 
@@ -121,49 +111,17 @@ void Project::makefyProject() const
 
 
 
-void Project::addPackageDependency(const std::string& name) const
-{
-	InvalidPackageIndexHandling::throwIfNotRegistered(name);
-	InvalidPackageIndexHandling::throwIfIsDependency(*this, name);
-
-	ProjectData projectData = getData();
-	projectData.dependencies.push_back(name);
-
-	ProjectDataManager::writeToFile(projectData, getAbsoluteProjectFilePath());
-}
-
-
-void Project::removePackageDependency(const std::string& name) const
-{
-	InvalidPackageIndexHandling::throwIfIsNotDependency(*this, name);
-
-	ProjectData projectData = getData();
-	projectData.dependencies.erase(find(projectData.dependencies, name));
-
-	ProjectDataManager::writeToFile(projectData, getAbsoluteProjectFilePath());
-}
-
-
-bool Project::isPackageADependency(const std::string& name) const noexcept
-{
-	const ProjectData projectData = getData();
-	return find(projectData.dependencies, name) != projectData.dependencies.cend();
-}
-
-
-
-
-
-std::vector<std::string> Project::getIncludePaths(const bool includeProject, const bool absolutePaths) const noexcept
+std::vector<std::string> Project::getPaths(const std::string& main, const std::vector<std::string>& additional,
+	const bool includeProject, const bool absolutePaths) const noexcept
 {
 	std::vector<std::string> includePaths;
 	std::vector<std::string> additionalPaths;
 
-	for (const std::string& path : getData().additionalIncludePaths)
+	for (const std::string& path : additional)
 		additionalPaths.push_back(absolutePaths ? toAbsoluteProjectPath(path).string() : path);
 
 	if (includeProject)
-		includePaths.push_back(getHeaderPath(absolutePaths));
+		includePaths.push_back(main);
 
 	insertAtEnd(includePaths, additionalPaths);
 
@@ -171,20 +129,15 @@ std::vector<std::string> Project::getIncludePaths(const bool includeProject, con
 }
 
 
+std::vector<std::string> Project::getIncludePaths(const bool includeProject, const bool absolutePaths) const noexcept
+{
+	return getPaths(getHeaderPath(absolutePaths), getData().additionalIncludePaths, includeProject, absolutePaths);
+}
+
+
 std::vector<std::string> Project::getLibraryPaths(const bool includeProject, const bool absolutePaths) const noexcept
 {
-	std::vector<std::string> libraryPaths;
-	std::vector<std::string> additionalPaths;
-
-	for (const std::string& path : getData().additionalLibraryPaths)
-		additionalPaths.push_back(absolutePaths ? toAbsoluteProjectPath(path).string() : path);
-
-	if (includeProject)
-		libraryPaths.push_back(getSourcePath(absolutePaths));
-
-	insertAtEnd(libraryPaths, additionalPaths);
-
-	return libraryPaths;
+	return getPaths(getSourcePath(absolutePaths), getData().additionalLibraryPaths, includeProject, absolutePaths);
 }
 
 
@@ -194,90 +147,7 @@ std::vector<std::string> Project::getLibraries() const noexcept
 
 	std::vector<std::string> libraries;
 
-	insertAtEnd(libraries, projectData.dependencies);
 	insertAtEnd(libraries, projectData.additionalLibraries);
-
-	return libraries;
-}
-
-
-std::vector<std::string> Project::getDependenciesIncludePaths() const noexcept
-{
-	std::vector<std::string> includePaths;
-
-	for (const std::string& dependency : getData().dependencies)
-	{
-		const Project package = GlobalPackageIndex::getPackage(dependency);
-
-		insertAtEnd(includePaths, package.getIncludePaths());
-		insertAtEnd(includePaths, package.getDependenciesIncludePaths());
-	}
-
-	return includePaths;
-}
-
-
-std::vector<std::string> Project::getDependenciesLibraryPaths() const noexcept
-{
-	std::vector<std::string> libraryPaths;
-
-	for (const std::string& dependency : getData().dependencies)
-	{
-		const Project package = GlobalPackageIndex::getPackage(dependency);
-
-		insertAtEnd(libraryPaths, package.getLibraryPaths());
-		insertAtEnd(libraryPaths, package.getDependenciesLibraryPaths());
-	}
-
-	return libraryPaths;
-}
-
-
-std::vector<std::string> Project::getDependenciesLibraries() const noexcept
-{
-	std::vector<std::string> libraries;
-
-	for (const std::string& dependency : getData().dependencies)
-	{
-		const Project package = GlobalPackageIndex::getPackage(dependency);
-
-		insertAtEnd(libraries, package.getLibraries());
-		insertAtEnd(libraries, package.getDependenciesLibraries());
-	}
-
-	return libraries;
-}
-
-
-std::vector<std::string> Project::getAllIncludePaths(const bool absolutePaths) const noexcept
-{
-	std::vector<std::string> includePaths;
-
-	insertAtEnd(includePaths, getIncludePaths(true, absolutePaths));
-	insertAtEnd(includePaths, getDependenciesIncludePaths());
-
-	return includePaths;
-}
-
-
-std::vector<std::string> Project::getAllLibraryPaths(const bool absolutePaths) const noexcept
-{
-	std::vector<std::string> libraryPaths;
-
-	// no need to include the project out library
-	insertAtEnd(libraryPaths, getLibraryPaths(false, absolutePaths));
-	insertAtEnd(libraryPaths, getDependenciesLibraryPaths());
-
-	return libraryPaths;
-}
-
-
-std::vector<std::string> Project::getAllLibraries() const noexcept
-{
-	std::vector<std::string> libraries;
-
-	insertAtEnd(libraries, getLibraries());
-	insertAtEnd(libraries, getDependenciesLibraries());
 
 	return libraries;
 }

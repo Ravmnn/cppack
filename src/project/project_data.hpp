@@ -102,7 +102,6 @@ class ProjectData : public JsonConversible, private JsonPropertiesValidator
 public:
 	static const JsonPropertyValidationRequirements prop_name;
 	static const JsonPropertyValidationRequirements prop_type;
-	static const JsonPropertyValidationRequirements prop_dependencies;
 	static const JsonPropertyValidationRequirements prop_sourceDirectory;
 	static const JsonPropertyValidationRequirements prop_headerDirectory;
 	static const JsonPropertyValidationRequirements prop_buildDirectory;
@@ -117,8 +116,6 @@ public:
 
     std::string name;
     ProjectType type;
-
-    std::vector<std::string> dependencies;
 
     std::string sourceDirectory;
     std::string headerDirectory;
